@@ -37,10 +37,16 @@ export const getActiveTournaments = async () => {
     );
     
     const snapshot = await getDocs(tournamentsQuery);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      
+      // Add document ID to the returned object
+      return {
+        id: doc.id,
+        ...data,
+        // We don't convert the date here, will handle it in the component
+      };
+    });
   } catch (error) {
     console.error('Error fetching active tournaments:', error);
     throw error;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { getActiveTournaments, registerForTournament } from '../../services/databaseService';
+import { getActiveTournaments, registerForTournament, getParticipantProfile } from '../../services/databaseService';
 
 function TournamentList() {
   const [tournaments, setTournaments] = useState([]);
@@ -17,64 +17,19 @@ function TournamentList() {
       try {
         setLoading(true);
         
-        // For now, we'll use placeholder data
-        setTimeout(() => {
-          const placeholderTournaments = [
-            {
-              id: 'tournament-1',
-              name: "Warhammer 40K Regional Championship",
-              date: new Date("2025-06-15"),
-              location: {
-                city: "London",
-                country: "United Kingdom"
-              },
-              numberOfRounds: 5,
-              format: "WTC",
-              status: "upcoming",
-              participantCount: 32
-            },
-            {
-              id: 'tournament-2',
-              name: "Age of Sigmar Open",
-              date: new Date("2025-07-22"),
-              location: {
-                city: "Manchester",
-                country: "United Kingdom"
-              },
-              numberOfRounds: 4,
-              format: "GW",
-              status: "upcoming",
-              participantCount: 24
-            },
-            {
-              id: 'tournament-3',
-              name: "40K Team Tournament",
-              date: new Date("2025-05-10"),
-              location: {
-                city: "Birmingham",
-                country: "United Kingdom"
-              },
-              numberOfRounds: 6,
-              format: "UKTC",
-              status: "inProgress",
-              participantCount: 48
-            }
-          ];
-          
-          setTournaments(placeholderTournaments);
-          setLoading(false);
-        }, 1000);
+        // Fetch real tournaments from Firestore
+        const tournamentsData = await getActiveTournaments();
+        console.log('Tournaments fetched:', tournamentsData); // Debug log
+        setTournaments(tournamentsData);
+        setLoading(false);
         
-        // Once you have real data, use:
-        // const tournamentsData = await getActiveTournaments();
-        // setTournaments(tournamentsData);
-        // setLoading(false);
       } catch (error) {
+        console.error('Error fetching tournaments:', error);
         setError('Failed to load tournaments: ' + error.message);
         setLoading(false);
       }
     };
-
+  
     fetchTournaments();
   }, []);
 
@@ -84,41 +39,50 @@ function TournamentList() {
       setError('');
       setSuccess('');
       
-      // Simulate registering for a tournament
-      setTimeout(() => {
-        setSuccess(`Successfully registered for the tournament!`);
-        setRegistering(false);
-        
-        // After successful registration, navigate to the dashboard
+      // Real registration with Firebase
+      const playerData = {
+        firstName: currentUser.displayName?.split(' ')[0] || '',
+        lastName: currentUser.displayName?.split(' ').slice(1).join(' ') || '',
+        teamName: '',
+        faction: '',
+        armyList: '',
+        participationStatus: 'registered'
+      };
+      
+      const result = await registerForTournament(currentUser.uid, tournamentId, playerData);
+      
+      if (result.success) {
+        setSuccess(result.message);
         setTimeout(() => {
           navigate('/dashboard');
         }, 2000);
-      }, 1500);
-      
-      // Once you have real data, use:
-      // const playerData = {
-      //   firstName: currentUser.displayName?.split(' ')[0] || '',
-      //   lastName: currentUser.displayName?.split(' ').slice(1).join(' ') || '',
-      //   teamName: '',
-      //   faction: '',
-      //   armyList: '',
-      //   participationStatus: 'registered'
-      // };
-      // 
-      // const result = await registerForTournament(currentUser.uid, tournamentId, playerData);
-      // 
-      // if (result.success) {
-      //   setSuccess(result.message);
-      //   setTimeout(() => {
-      //     navigate('/dashboard');
-      //   }, 2000);
-      // } else {
-      //   setError(result.message);
-      // }
-      // setRegistering(false);
+      } else {
+        setError(result.message);
+      }
+      setRegistering(false);
     } catch (error) {
+      console.error('Error registering:', error);
       setError('Failed to register: ' + error.message);
       setRegistering(false);
+    }
+  };
+
+  const handleViewDetails = async (tournamentId) => {
+    try {
+      // Check if the user is already registered
+      const profile = await getParticipantProfile(currentUser.uid, tournamentId);
+      
+      if (profile) {
+        // If registered, go directly to dashboard
+        navigate('/dashboard');
+      } else {
+        // If not registered, show tournament details
+        navigate(`/tournaments/${tournamentId}`);
+      }
+    } catch (error) {
+      console.error('Error checking registration:', error);
+      // If there's an error, still navigate to tournament details
+      navigate(`/tournaments/${tournamentId}`);
     }
   };
 
@@ -165,24 +129,30 @@ function TournamentList() {
                     <div className="mt-2 max-w-xl text-sm text-gray-500">
                       <p>
                         <span className="font-medium">Date:</span>{' '}
-                        {tournament.date.toLocaleDateString('en-GB', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
+                        {tournament.date && tournament.date.toDate ? 
+                          tournament.date.toDate().toLocaleDateString('en-GB', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          }) : 
+                          'Date not available'
+                        }
                       </p>
                       <p>
                         <span className="font-medium">Location:</span>{' '}
-                        {tournament.location.city}, {tournament.location.country}
+                        {tournament.location ? 
+                          `${tournament.location.city || 'Unknown city'}, ${tournament.location.country || 'Unknown country'}` : 
+                          'Location not available'
+                        }
                       </p>
                       <p>
-                        <span className="font-medium">Format:</span> {tournament.format}
+                        <span className="font-medium">Format:</span> {tournament.format || 'Not specified'}
                       </p>
                       <p>
-                        <span className="font-medium">Rounds:</span> {tournament.numberOfRounds}
+                        <span className="font-medium">Rounds:</span> {tournament.numberOfRounds || 'Not specified'}
                       </p>
                       <p>
-                        <span className="font-medium">Participants:</span> {tournament.participantCount}
+                        <span className="font-medium">Participants:</span> {tournament.participantCount || 0}
                       </p>
                     </div>
                   </div>
@@ -212,7 +182,7 @@ function TournamentList() {
                       </button>
                       
                       <button
-                        onClick={() => navigate(`/tournaments/${tournament.id}`)}
+                        onClick={() => handleViewDetails(tournament.id)}
                         className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                       >
                         View Details

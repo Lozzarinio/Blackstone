@@ -6,6 +6,7 @@ import Signup from './components/auth/Signup';
 import ForgotPassword from './components/auth/ForgotPassword';
 import Dashboard from './components/dashboard/Dashboard';
 import TournamentList from './components/tournaments/TournamentList';
+import TournamentDetails from './components/tournaments/TournamentDetails';
 import './App.css';
 
 // Protected route component
@@ -32,6 +33,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <TournamentList />
+                </PrivateRoute>
+              } 
+            />
+            
+            <Route 
+              path="/tournaments/:tournamentId" 
+              element={
+                <PrivateRoute>
+                  <TournamentDetails />
                 </PrivateRoute>
               } 
             />

@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../../firebase/firebase';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { useAuth } from '../../../contexts/AuthContext';
+import { 
+  updateParticipantProfile, 
+  submitArmyList, 
+  updateParticipationStatus,
+  getParticipantProfile
+} from '../../../services/databaseService';
 
-function PlayerDetails() {
+function PlayerDetails({ participantProfile, tournamentId }) {
   const { currentUser } = useAuth();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [profile, setProfile] = useState(null);
   
   // Player details state
   const [firstName, setFirstName] = useState('');
@@ -18,105 +23,125 @@ function PlayerDetails() {
   const [listStatus, setListStatus] = useState('unsubmitted');
   const [participationStatus, setParticipationStatus] = useState('registered');
 
-  useEffect(() => {
-    const fetchPlayerDetails = async () => {
-      if (!currentUser) return;
-      
-      try {
-        setLoading(true);
-        
-        // For now we'll use placeholder data, but in a real app this would fetch from Firestore
-        // This would typically look for a participant document linked to the current user
-        // and the active tournament
-        
-        // Simulating a delay to mimic an actual database fetch
-        setTimeout(() => {
-          setFirstName('John');
-          setLastName('Doe');
-          setTeamName('The Space Marines');
-          setFaction('Adeptus Astartes');
-          setArmyList('HQ: Captain with power sword and bolt pistol\nTroops: 5x Intercessors with auto bolt rifles\nTroops: 5x Intercessors with auto bolt rifles\nElites: Redemptor Dreadnought with macro plasma incinerator');
-          setListStatus('unsubmitted');
-          setParticipationStatus('registered');
-          setLoading(false);
-        }, 1000);
-        
-      } catch (error) {
-        setError('Failed to load player details: ' + error.message);
-        setLoading(false);
+  // Function to fetch the latest profile data
+  const fetchProfileData = async () => {
+    if (!currentUser || !tournamentId) return;
+    
+    try {
+      const freshProfile = await getParticipantProfile(currentUser.uid, tournamentId);
+      if (freshProfile) {
+        setProfile(freshProfile);
+        setFirstName(freshProfile.firstName || '');
+        setLastName(freshProfile.lastName || '');
+        setTeamName(freshProfile.teamName || '');
+        setFaction(freshProfile.faction || '');
+        setArmyList(freshProfile.armyList || '');
+        setListStatus(freshProfile.listStatus || 'unsubmitted');
+        setParticipationStatus(freshProfile.participationStatus || 'registered');
+        console.log('Loaded profile data:', freshProfile);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching fresh profile data:', error);
+    }
+  };
 
-    fetchPlayerDetails();
-  }, [currentUser]);
+  // Load data when component mounts or when participantProfile changes
+  useEffect(() => {
+    if (participantProfile) {
+      setProfile(participantProfile);
+      setFirstName(participantProfile.firstName || '');
+      setLastName(participantProfile.lastName || '');
+      setTeamName(participantProfile.teamName || '');
+      setFaction(participantProfile.faction || '');
+      setArmyList(participantProfile.armyList || '');
+      setListStatus(participantProfile.listStatus || 'unsubmitted');
+      setParticipationStatus(participantProfile.participationStatus || 'registered');
+    } else {
+      // If no profile is provided, try to fetch it
+      fetchProfileData();
+    }
+  }, [participantProfile, tournamentId, currentUser]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!currentUser) return;
+    if (!currentUser || !profile) return;
     
     try {
       setLoading(true);
       setError('');
       setSuccess('');
       
-      // In a real app, this would update the participant document in Firestore
-      // For now, we'll just simulate a successful update
+      // Update participant profile in Firestore
+      const updatedData = {
+        firstName,
+        lastName,
+        teamName,
+        faction
+      };
       
-      setTimeout(() => {
-        setSuccess('Player details updated successfully!');
-        setLoading(false);
-      }, 1000);
+      await updateParticipantProfile(profile.id, updatedData);
       
+      // Fetch the updated profile to make sure we have the latest data
+      await fetchProfileData();
+      
+      setSuccess('Player details updated successfully!');
+      setLoading(false);
     } catch (error) {
+      console.error('Failed to update player details:', error);
       setError('Failed to update player details: ' + error.message);
       setLoading(false);
     }
   };
 
   const handleArmyListSubmit = async () => {
+    if (!profile || !armyList.trim()) return;
+    
     try {
       setLoading(true);
       setError('');
       setSuccess('');
       
-      // In a real app, this would update the army list in Firestore
-      // and set the list status to 'submitted'
+      // Submit army list to Firestore
+      await submitArmyList(profile.id, armyList);
       
-      setTimeout(() => {
-        setListStatus('submitted');
-        setSuccess('Army list submitted successfully!');
-        setLoading(false);
-      }, 1000);
+      // Fetch the updated profile to make sure we have the latest data
+      await fetchProfileData();
       
+      setSuccess('Army list submitted successfully!');
+      setLoading(false);
     } catch (error) {
+      console.error('Failed to submit army list:', error);
       setError('Failed to submit army list: ' + error.message);
       setLoading(false);
     }
   };
 
   const handleStatusChange = async (status) => {
+    if (!profile) return;
+    
     try {
       setLoading(true);
       setError('');
       setSuccess('');
       
-      // In a real app, this would update the participation status in Firestore
+      // Update participation status in Firestore
+      await updateParticipationStatus(profile.id, status);
       
-      setTimeout(() => {
-        setParticipationStatus(status);
-        setSuccess(`You have ${status === 'checkedIn' ? 'checked in to' : 'dropped from'} the tournament.`);
-        setLoading(false);
-      }, 1000);
+      // Fetch the updated profile to make sure we have the latest data
+      await fetchProfileData();
       
+      setSuccess(`You have ${status === 'checkedIn' ? 'checked in to' : 'dropped from'} the tournament.`);
+      setLoading(false);
     } catch (error) {
+      console.error(`Failed to update status:`, error);
       setError(`Failed to update status: ${error.message}`);
       setLoading(false);
     }
   };
 
-  if (loading && !firstName) {
-    return <div className="text-center py-10">Loading player details...</div>;
+  if (!profile && !participantProfile) {
+    return <div className="text-center py-10">No participant profile found. Please register for a tournament first.</div>;
   }
 
   return (
@@ -127,13 +152,13 @@ function PlayerDetails() {
       </div>
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded relative">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mx-4 mb-4 rounded relative">
           {error}
         </div>
       )}
       
       {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mb-4 rounded relative">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mx-4 mb-4 rounded relative">
           {success}
         </div>
       )}
