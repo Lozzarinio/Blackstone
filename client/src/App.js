@@ -7,6 +7,7 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import Dashboard from './components/dashboard/Dashboard';
 import TournamentList from './components/tournaments/TournamentList';
 import TournamentDetails from './components/tournaments/TournamentDetails';
+import Home from './components/home/Home';
 import './App.css';
 
 // Protected route component
@@ -27,9 +28,12 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             
+            {/* Home Route (Landing Page) */}
+            <Route path="/" element={<Home />} />
+            
             {/* Private Routes */}
             <Route 
-              path="/" 
+              path="/tournaments" 
               element={
                 <PrivateRoute>
                   <TournamentList />
