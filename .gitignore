@@ -29,4 +29,5 @@ yarn-error.log*
 *.sw?
 
 # macOS
-.DS_Store
+.DS_Storegit2txt/
+git2txt/

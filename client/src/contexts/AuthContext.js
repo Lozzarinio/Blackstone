@@ -4,6 +4,8 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   sendPasswordResetEmail,
+  updateEmail,
+  updatePassword,
   onAuthStateChanged
 } from 'firebase/auth';
 import { auth } from '../firebase/firebase';
@@ -48,7 +50,13 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
-    resetPassword
+    resetPassword,
+    updateEmail: (email) => {
+      return updateEmail(auth.currentUser, email);
+    },
+    updatePassword: (password) => {
+      return updatePassword(auth.currentUser, password);
+    }
   };
 
   return (

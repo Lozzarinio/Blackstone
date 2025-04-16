@@ -8,6 +8,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import TournamentList from './components/tournaments/TournamentList';
 import TournamentDetails from './components/tournaments/TournamentDetails';
 import Home from './components/home/Home';
+import Profile from './components/profile/Profile';
 import './App.css';
 
 // Protected route component
@@ -32,6 +33,15 @@ function App() {
             <Route path="/" element={<Home />} />
             
             {/* Private Routes */}
+            <Route 
+              path="/profile" 
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              } 
+            />
+            
             <Route 
               path="/tournaments" 
               element={
