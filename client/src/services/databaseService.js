@@ -279,6 +279,19 @@ export const getUserProfile = async (userId) => {
   }
 };
 
+export const updateUserProfile = async (userId, profileData) => {
+  try {
+    await updateDoc(doc(db, 'users', userId), {
+      ...profileData,
+      updatedAt: new Date()
+    });
+    return true;
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
+};
+
 export const registerForTournament = async (userId, tournamentId, playerData) => {
   try {
     // Check if the user is already registered for this tournament
