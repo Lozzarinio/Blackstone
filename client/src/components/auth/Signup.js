@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserProfile } from '../../services/databaseService';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 
 function Signup() {
   const [email, setEmail] = useState('');
@@ -14,11 +15,11 @@ function Signup() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-  
+
     if (password !== passwordConfirm) {
       return setError('Passwords do not match');
     }
-  
+
     try {
       setError('');
       setLoading(true);
@@ -40,86 +41,92 @@ function Signup() {
     } catch (error) {
       setError('Failed to create an account: ' + error.message);
     }
-  
+
     setLoading(false);
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your Blackstone account
-          </h2>
-        </div>
-        
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">{error}</div>}
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password-confirm" className="sr-only">Confirm Password</label>
-              <input
-                id="password-confirm"
-                name="password-confirm"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm Password"
-                value={passwordConfirm}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
-            </div>
-          </div>
+    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      <Container className="py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+        <Row className="justify-content-center w-100">
+          <Col xs={12} md={8} lg={6} xl={5}>
+            <Card className="bg-dark text-light border-secondary">
+              <Card.Body className="p-5">
+                <div className="text-center mb-4">
+                  <h2 className="fw-bold text-primary">BLACKSTONE</h2>
+                  <h3 className="mt-2">Create an Account</h3>
+                </div>
 
-          <div className="flex items-center justify-center">
-            <div className="text-sm">
-              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Already have an account? Sign in
-              </Link>
-            </div>
-          </div>
+                {error && <Alert variant="danger">{error}</Alert>}
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Sign Up
-            </button>
-          </div>
-        </form>
-      </div>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-4" controlId="email">
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-dark text-light border-secondary"
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-4" controlId="password">
+                    <Form.Label>Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-dark text-light border-secondary"
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-4" controlId="password-confirm">
+                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Control
+                      type="password"
+                      value={passwordConfirm}
+                      onChange={(e) => setPasswordConfirm(e.target.value)}
+                      required
+                      className="bg-dark text-light border-secondary"
+                    />
+                  </Form.Group>
+
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-100 py-2"
+                    disabled={loading}
+                  >
+                    {loading ? 'Creating Account...' : 'Sign Up'}
+                  </Button>
+
+                  <div className="text-center mt-4">
+                    <p className="text-muted">
+                      Already have an account?{' '}
+                      <Link to="/login" className="text-primary">Sign in</Link>
+                    </p>
+                    <Button
+                      variant="outline-secondary"
+                      className="mt-3"
+                      onClick={() => navigate('/')}
+                    >
+                      Back to Home
+                    </Button>
+                  </div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+
+      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+        <Container>
+          <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
+        </Container>
+      </footer>
     </div>
   );
 }

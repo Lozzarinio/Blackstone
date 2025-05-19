@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -26,59 +27,64 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Reset Password
-          </h2>
-        </div>
-        
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">{error}</div>}
-        {message && <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">{message}</div>}
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
+    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      <Container className="py-5 flex-grow-1 d-flex align-items-center justify-content-center">
+        <Row className="justify-content-center w-100">
+          <Col xs={12} md={8} lg={6} xl={5}>
+            <Card className="bg-dark text-light border-secondary">
+              <Card.Body className="p-5">
+                <div className="text-center mb-4">
+                  <h2 className="fw-bold text-primary">BLACKSTONE</h2>
+                  <h3 className="mt-2">Reset Password</h3>
+                </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Back to login
-              </Link>
-            </div>
-            <div className="text-sm">
-              <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Need an account? Sign up
-              </Link>
-            </div>
-          </div>
+                {error && <Alert variant="danger">{error}</Alert>}
+                {message && <Alert variant="success">{message}</Alert>}
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Reset Password
-            </button>
-          </div>
-        </form>
-      </div>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="mb-4" controlId="email">
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="bg-dark text-light border-secondary"
+                    />
+                    <Form.Text className="text-muted">
+                      We'll send a password reset link to this email address.
+                    </Form.Text>
+                  </Form.Group>
+
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="w-100 py-2"
+                    disabled={loading}
+                  >
+                    {loading ? 'Sending...' : 'Reset Password'}
+                  </Button>
+
+                  <div className="d-flex justify-content-between mt-4">
+                    <Link to="/login" className="text-primary">
+                      Back to login
+                    </Link>
+                    <Link to="/signup" className="text-primary">
+                      Create account
+                    </Link>
+                  </div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+
+      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+        <Container>
+          <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
+        </Container>
+      </footer>
     </div>
   );
 }

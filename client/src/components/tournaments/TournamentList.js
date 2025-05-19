@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getActiveTournaments, registerForTournament, getParticipantProfile } from '../../services/databaseService';
+import { Container, Row, Col, Card, Table, Badge, Button, Alert, Spinner } from 'react-bootstrap';
 
 function TournamentList() {
   const [tournaments, setTournaments] = useState([]);
@@ -86,115 +87,145 @@ function TournamentList() {
     }
   };
 
-  if (loading) {
-    return <div className="text-center py-10">Loading tournaments...</div>;
-  }
-
-  if (error) {
-    return <div className="text-red-500 text-center py-10">{error}</div>;
-  }
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case 'upcoming':
+        return <Badge bg="warning">Upcoming</Badge>;
+      case 'inProgress':
+        return <Badge bg="success">In Progress</Badge>;
+      case 'completed':
+        return <Badge bg="secondary">Completed</Badge>;
+      default:
+        return <Badge bg="info">{status}</Badge>;
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 sm:px-0 mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Available Tournaments</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Browse and register for upcoming tournaments.
-        </p>
-      </div>
-      
-      {success && (
-        <div className="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-          {success}
-        </div>
-      )}
-      
-      <div className="flex flex-col space-y-4">
-        {tournaments.length === 0 ? (
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">No tournaments available</h3>
-              <div className="mt-2 max-w-xl text-sm text-gray-500">
-                <p>There are currently no upcoming tournaments. Please check back later.</p>
-              </div>
-            </div>
+    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      {/* Navigation */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+        <Container>
+          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <button
+            onClick={() => navigate('/')}
+            className="btn btn-outline-light"
+          >
+            Back to Home
+          </button>
+        </Container>
+      </nav>
+
+      <Container className="py-4 flex-grow-1">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 className="mb-0">Available Tournaments</h2>
+            <p className="text-muted">Browse and register for upcoming tournaments</p>
           </div>
-        ) : (
-          tournaments.map((tournament) => (
-            <div key={tournament.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <div className="md:flex md:justify-between md:items-center">
-                  <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">{tournament.name}</h3>
-                    <div className="mt-2 max-w-xl text-sm text-gray-500">
-                      <p>
-                        <span className="font-medium">Date:</span>{' '}
-                        {tournament.date && tournament.date.toDate ? 
-                          tournament.date.toDate().toLocaleDateString('en-GB', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                          }) : 
-                          'Date not available'
-                        }
-                      </p>
-                      <p>
-                        <span className="font-medium">Location:</span>{' '}
-                        {tournament.location ? 
-                          `${tournament.location.city || 'Unknown city'}, ${tournament.location.country || 'Unknown country'}` : 
-                          'Location not available'
-                        }
-                      </p>
-                      <p>
-                        <span className="font-medium">Format:</span> {tournament.format || 'Not specified'}
-                      </p>
-                      <p>
-                        <span className="font-medium">Rounds:</span> {tournament.numberOfRounds || 'Not specified'}
-                      </p>
-                      <p>
-                        <span className="font-medium">Participants:</span> {tournament.participantCount || 0}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-5 md:mt-0 md:ml-6">
-                    <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full mb-4 ${
-                      tournament.status === 'upcoming' ? 'bg-yellow-100 text-yellow-800' :
-                      tournament.status === 'inProgress' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {tournament.status === 'upcoming' ? 'Upcoming' :
-                      tournament.status === 'inProgress' ? 'In Progress' :
-                      'Completed'}
-                    </span>
-                    
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => handleRegister(tournament.id)}
-                        disabled={registering || tournament.status !== 'upcoming'}
-                        className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${
-                          registering ? 'bg-gray-400 cursor-not-allowed' :
-                          tournament.status !== 'upcoming' ? 'bg-gray-400 cursor-not-allowed' :
-                          'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-                        }`}
-                      >
-                        {registering ? 'Registering...' : 'Register'}
-                      </button>
-                      
-                      <button
-                        onClick={() => handleViewDetails(tournament.id)}
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      >
-                        View Details
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
+          <div className="d-flex gap-2">
+            <Button variant="outline-light" size="sm">
+              <i className="bi bi-funnel me-1"></i> Filter
+            </Button>
+            <Button variant="outline-light" size="sm">
+              <i className="bi bi-sort-down me-1"></i> Sort
+            </Button>
+          </div>
+        </div>
+
+        {success && (
+          <Alert variant="success" className="mb-4">
+            {success}
+          </Alert>
         )}
-      </div>
+
+        {error && (
+          <Alert variant="danger" className="mb-4">
+            {error}
+          </Alert>
+        )}
+
+        {loading ? (
+          <div className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-3">Loading tournaments...</p>
+          </div>
+        ) : tournaments.length === 0 ? (
+          <Card className="bg-dark border-secondary">
+            <Card.Body className="text-center py-5">
+              <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
+              <h3 className="mt-3">No tournaments available</h3>
+              <p className="text-muted">There are currently no upcoming tournaments. Please check back later.</p>
+            </Card.Body>
+          </Card>
+        ) : (
+          <Row>
+            {tournaments.map((tournament) => (
+              <Col xs={12} className="mb-4" key={tournament.id}>
+                <Card className="bg-dark border-secondary h-100">
+                  <Card.Body>
+                    <div className="d-flex flex-column flex-md-row justify-content-between">
+                      <div className="mb-3 mb-md-0">
+                        <div className="d-flex align-items-center mb-2">
+                          <h4 className="mb-0 me-2">{tournament.name}</h4>
+                          {getStatusBadge(tournament.status)}
+                        </div>
+                        <p className="text-muted mb-2">
+                          <i className="bi bi-calendar me-2"></i>
+                          {tournament.date && tournament.date.toDate ? 
+                            tournament.date.toDate().toLocaleDateString('en-GB', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            }) : 
+                            'Date not available'
+                          }
+                        </p>
+                        <p className="text-muted mb-2">
+                          <i className="bi bi-geo-alt me-2"></i>
+                          {tournament.location ? 
+                            `${tournament.location.city || 'Unknown city'}, ${tournament.location.country || 'Unknown country'}` : 
+                            'Location not available'
+                          }
+                        </p>
+                        <p className="text-muted mb-0">
+                          <i className="bi bi-people me-2"></i>
+                          Format: {tournament.format || 'Not specified'} | 
+                          <i className="bi bi-layers me-2 ms-2"></i>
+                          Rounds: {tournament.numberOfRounds || 'Not specified'} |
+                          <i className="bi bi-person-badge me-2 ms-2"></i>
+                          Participants: {tournament.participantCount || 0}
+                        </p>
+                      </div>
+                      <div className="d-flex flex-column justify-content-center">
+                        <div className="d-grid gap-2">
+                          <Button 
+                            variant="primary"
+                            onClick={() => handleRegister(tournament.id)}
+                            disabled={registering || tournament.status !== 'upcoming'}
+                          >
+                            {registering ? 'Registering...' : 'Register'}
+                          </Button>
+                          <Button 
+                            variant="outline-light"
+                            onClick={() => handleViewDetails(tournament.id)}
+                          >
+                            View Details
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+      </Container>
+
+      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary mt-auto">
+        <Container>
+          <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
+        </Container>
+      </footer>
     </div>
   );
 }

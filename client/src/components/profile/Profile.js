@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserProfile, updateUserProfile, createUserProfile } from '../../services/databaseService';
+import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 
 function Profile() {
   const { currentUser, updateEmail, updatePassword } = useAuth();
@@ -28,55 +29,40 @@ function Profile() {
     
       try {
         setLoading(true);
-        console.log("Current user ID:", currentUser.uid);
-        
         let profileData = await getUserProfile(currentUser.uid);
-        console.log("Profile data retrieved:", profileData);
         
         // If no profile document exists, create one
         if (!profileData) {
-          console.log("No profile found, creating new profile");
-          const newProfileData = {
+          await createUserProfile(currentUser.uid, {
             email: currentUser.email,
             firstName: '',
             lastName: '', 
             teamName: '',
             createdAt: new Date(),
             updatedAt: new Date()
-          };
-          
-          await createUserProfile(currentUser.uid, newProfileData);
-          console.log("New profile created");
+          });
           
           // Fetch the newly created profile
-          profileData = await getUserProfile(currentUser.uid);
-          console.log("Refetched profile data:", profileData);
+          profileData = {
+            email: currentUser.email,
+            firstName: '',
+            lastName: '',
+            teamName: ''
+          };
         }
         
-        // Set form fields with profile data
-        console.log("Setting form fields with:", profileData);
-        setFirstName(profileData?.firstName || '');
-        setLastName(profileData?.lastName || '');
-        setTeamName(profileData?.teamName || '');
+        setFirstName(profileData.firstName || '');
+        setLastName(profileData.lastName || '');
+        setTeamName(profileData.teamName || '');
         setEmail(currentUser.email || '');
-        
         setLoading(false);
-        
-        // Log state after update (this will be one render cycle behind)
-        console.log("Current state after setting:", { firstName, lastName, teamName });
-        
-        // Add a slight delay and log again to see state after it updates
-        setTimeout(() => {
-          console.log("State after timeout:", { firstName, lastName, teamName });
-        }, 500);
-        
       } catch (error) {
         console.error('Error loading profile:', error);
         setError('Failed to load profile: ' + error.message);
         setLoading(false);
       }
     };
-  
+
     fetchUserProfile();
   }, [currentUser, navigate]);
 
@@ -124,148 +110,144 @@ function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      {/* Navigation */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+        <Container>
+          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="btn btn-outline-light"
           >
             Back to Home
           </button>
-        </div>
-      </header>
+        </Container>
+      </nav>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6">
-            <h2 className="text-lg leading-6 font-medium text-gray-900">Profile Information</h2>
-            <p className="mt-1 text-sm text-gray-500">Update your personal details and account settings.</p>
-          </div>
+      <Container className="py-4 flex-grow-1">
+        <Card className="bg-dark text-light border-secondary">
+          <Card.Header className="bg-dark border-secondary">
+            <h2 className="mb-0">Profile Information</h2>
+            <p className="text-muted mb-0">Update your personal details and account settings.</p>
+          </Card.Header>
 
           {error && (
-            <div className="mx-6 my-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              <p>{error}</p>
-            </div>
+            <Alert variant="danger" className="mx-3 mt-3">
+              {error}
+            </Alert>
           )}
 
           {success && (
-            <div className="mx-6 my-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              <p>{success}</p>
-            </div>
+            <Alert variant="success" className="mx-3 mt-3">
+              {success}
+            </Alert>
           )}
 
-          <div className="border-t border-gray-200">
-            <form onSubmit={handleSubmit}>
-              <div className="px-4 py-5 bg-white sm:p-6">
-                <div className="grid grid-cols-6 gap-6">
-                  {/* Personal Information */}
-                  <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                      First name
-                    </label>
-                    <input
+          <Card.Body>
+            <Form onSubmit={handleSubmit}>
+              <Row>
+                <Col xs={12}>
+                  <h4 className="border-bottom border-secondary pb-2 mb-4">Personal Information</h4>
+                </Col>
+                <Col md={6} className="mb-3">
+                  <Form.Group controlId="firstName">
+                    <Form.Label>First name</Form.Label>
+                    <Form.Control
                       type="text"
-                      name="first-name"
-                      id="first-name"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      placeholder="Enter your first name"
+                      className="bg-dark text-light border-secondary"
                     />
-                  </div>
+                  </Form.Group>
+                </Col>
 
-                  <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
-                      Last name
-                    </label>
-                    <input
+                <Col md={6} className="mb-3">
+                  <Form.Group controlId="lastName">
+                    <Form.Label>Last name</Form.Label>
+                    <Form.Control
                       type="text"
-                      name="last-name"
-                      id="last-name"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      placeholder="Enter your last name"
+                      className="bg-dark text-light border-secondary"
                     />
-                  </div>
+                  </Form.Group>
+                </Col>
 
-                  <div className="col-span-6">
-                    <label htmlFor="team-name" className="block text-sm font-medium text-gray-700">
-                      Team name
-                    </label>
-                    <input
+                <Col xs={12} className="mb-3">
+                  <Form.Group controlId="teamName">
+                    <Form.Label>Team name</Form.Label>
+                    <Form.Control
                       type="text"
-                      name="team-name"
-                      id="team-name"
                       value={teamName}
                       onChange={(e) => setTeamName(e.target.value)}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      placeholder="Enter your team name"
+                      className="bg-dark text-light border-secondary"
                     />
-                  </div>
+                  </Form.Group>
+                </Col>
 
-                  {/* Account Information */}
-                  <div className="col-span-6 border-t border-gray-200 pt-5">
-                    <h3 className="text-lg font-medium leading-6 text-gray-900">Account Settings</h3>
-                    <p className="mt-1 text-sm text-gray-500">Update your email and password.</p>
-                  </div>
+                <Col xs={12}>
+                  <h4 className="border-bottom border-secondary pb-2 mb-4 mt-2">Account Settings</h4>
+                </Col>
 
-                  <div className="col-span-6">
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                      Email address
-                    </label>
-                    <input
+                <Col xs={12} className="mb-3">
+                  <Form.Group controlId="email">
+                    <Form.Label>Email address</Form.Label>
+                    <Form.Control
                       type="email"
-                      name="email"
-                      id="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="bg-dark text-light border-secondary"
                     />
-                  </div>
+                  </Form.Group>
+                </Col>
 
-                  <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
-                      New password (leave blank to keep current)
-                    </label>
-                    <input
+                <Col md={6} className="mb-3">
+                  <Form.Group controlId="newPassword">
+                    <Form.Label>New password (leave blank to keep current)</Form.Label>
+                    <Form.Control
                       type="password"
-                      name="new-password"
-                      id="new-password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="bg-dark text-light border-secondary"
                     />
-                  </div>
+                  </Form.Group>
+                </Col>
 
-                  <div className="col-span-6 sm:col-span-3">
-                    <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
-                      Confirm new password
-                    </label>
-                    <input
+                <Col md={6} className="mb-3">
+                  <Form.Group controlId="confirmPassword">
+                    <Form.Label>Confirm new password</Form.Label>
+                    <Form.Control
                       type="password"
-                      name="confirm-password"
-                      id="confirm-password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                      className="bg-dark text-light border-secondary"
                     />
-                  </div>
-                </div>
-              </div>
+                  </Form.Group>
+                </Col>
+              </Row>
 
-              <div className="px-4 py-3 bg-gray-50 text-right sm:px-6">
-                <button
+              <div className="text-end mt-3">
+                <Button
                   type="submit"
+                  variant="primary"
                   disabled={loading}
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
-                </button>
+                </Button>
               </div>
-            </form>
-          </div>
-        </div>
-      </main>
+            </Form>
+          </Card.Body>
+        </Card>
+      </Container>
+
+      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+        <Container>
+          <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
+        </Container>
+      </footer>
     </div>
   );
 }

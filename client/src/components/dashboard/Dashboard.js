@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TournamentInfo from './tabs/TournamentInfo';
 import PlayerDetails from './tabs/PlayerDetails';
 import Roster from './tabs/Roster';
@@ -11,6 +11,7 @@ import {
   getTournament, 
   getActiveTournaments 
 } from '../../services/databaseService';
+import { Container, Row, Col, Nav, Card, Spinner, Alert } from 'react-bootstrap';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('tournamentInfo');
@@ -20,6 +21,7 @@ function Dashboard() {
   const [participantProfile, setParticipantProfile] = useState(null);
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const checkTournamentRegistration = async () => {
@@ -31,14 +33,32 @@ function Dashboard() {
         
         console.log('Checking tournament registration for user:', currentUser.uid);
         
-        // Query Firestore directly for active tournaments
+        // Get the tournamentId from URL query params if available
+        const params = new URLSearchParams(location.search);
+        const urlTournamentId = params.get('tournamentId');
+        
+        if (urlTournamentId) {
+          // Check if user is registered for this specific tournament
+          const profile = await getParticipantProfile(currentUser.uid, urlTournamentId);
+          
+          if (profile) {
+            // Found the registration for the specified tournament
+            const tournamentData = await getTournament(urlTournamentId);
+            setParticipantProfile(profile);
+            setCurrentTournament(tournamentData);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // If no tournament specified or user not registered for the specified one,
+        // find any tournament they're registered for
         const activeTournaments = await getActiveTournaments();
-        console.log('Active tournaments:', activeTournaments);
-  
+        
         if (activeTournaments.length === 0) {
-          console.log('No tournaments found');
+          setError('No tournaments found');
           setLoading(false);
-          navigate('/'); // Redirect to tournament list if no tournaments found
+          setTimeout(() => navigate('/tournaments'), 3000);
           return;
         }
   
@@ -47,32 +67,23 @@ function Dashboard() {
         let participantData = null;
         let tournamentData = null;
         
-        // Check each tournament to see if the user is registered
         for (const tournament of activeTournaments) {
-          console.log(`Checking registration for tournament: ${tournament.id}`);
           const profile = await getParticipantProfile(currentUser.uid, tournament.id);
-          console.log('Profile check result:', profile);
           
           if (profile) {
-            // Found a registration
             participantData = profile;
             tournamentData = tournament;
             foundRegistration = true;
-            console.log('Found registration for tournament:', tournament.id);
             break;
           }
         }
         
         if (foundRegistration) {
-          // User is registered for a tournament
           setParticipantProfile(participantData);
           setCurrentTournament(tournamentData);
-          console.log('Set current tournament:', tournamentData);
         } else {
-          // User is not registered for any tournament
-          console.log('User not registered for any tournament');
           setError('You are not registered for any tournament. Please register first.');
-          setTimeout(() => navigate('/'), 3000);
+          setTimeout(() => navigate('/tournaments'), 3000);
         }
         
         setLoading(false);
@@ -84,7 +95,7 @@ function Dashboard() {
     };
     
     checkTournamentRegistration();
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, location.search]);
 
   async function handleLogout() {
     try {
@@ -114,65 +125,67 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-xl">Loading dashboard...</p>
+      <div className="bg-dark text-light min-vh-100 d-flex flex-column justify-content-center align-items-center">
+        <Spinner animation="border" variant="primary" />
+        <p className="mt-3">Loading dashboard...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-red-500 text-center">
-          <p className="text-xl">{error}</p>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-          >
-            Return to Tournaments
-          </button>
-        </div>
+      <div className="bg-dark text-light min-vh-100 d-flex flex-column justify-content-center align-items-center">
+        <Alert variant="danger" className="mb-4">
+          {error}
+        </Alert>
+        <button
+          onClick={() => navigate('/tournaments')}
+          className="btn btn-primary"
+        >
+          Browse Tournaments
+        </button>
       </div>
     );
   }
 
   if (!currentTournament) {
-    navigate('/');
+    navigate('/tournaments');
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Blackstone</h1>
-          <div>
-            <span className="mr-4">{currentUser.email}</span>
+    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      {/* Navigation */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+        <Container>
+          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <div className="d-flex align-items-center">
+            <span className="me-3 text-light d-none d-md-inline">{currentUser.email}</span>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+              className="btn btn-outline-danger"
             >
               Log Out
             </button>
           </div>
-        </div>
-      </header>
-      
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        {/* Tournament name and status */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">{currentTournament.name}</h2>
-          <div className="mt-1 flex items-center">
-            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full mr-2 ${
-              currentTournament.status === 'upcoming' ? 'bg-yellow-100 text-yellow-800' :
-              currentTournament.status === 'inProgress' ? 'bg-green-100 text-green-800' :
-              'bg-gray-100 text-gray-800'
-            }`}>
+        </Container>
+      </nav>
+
+      <Container className="py-4 flex-grow-1">
+        {/* Tournament Header */}
+        <div className="mb-4">
+          <h2>{currentTournament.name}</h2>
+          <div className="d-flex align-items-center">
+            <span className={`badge ${
+              currentTournament.status === 'upcoming' ? 'bg-warning' :
+              currentTournament.status === 'inProgress' ? 'bg-success' :
+              'bg-secondary'
+            } me-2`}>
               {currentTournament.status === 'upcoming' ? 'Upcoming' :
                currentTournament.status === 'inProgress' ? 'In Progress' :
                'Completed'}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-muted">
               {currentTournament.date && currentTournament.date.toDate ? 
                 currentTournament.date.toDate().toLocaleDateString('en-GB', { 
                   year: 'numeric', 
@@ -185,67 +198,64 @@ function Dashboard() {
           </div>
         </div>
         
-        {/* Tabs navigation */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-            <button
+        {/* Tabs Navigation */}
+        <Nav variant="tabs" className="mb-4 border-bottom border-secondary">
+          <Nav.Item>
+            <Nav.Link 
+              active={activeTab === 'tournamentInfo'} 
               onClick={() => setActiveTab('tournamentInfo')}
-              className={`${
-                activeTab === 'tournamentInfo'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={activeTab === 'tournamentInfo' ? 'text-white bg-primary' : 'text-light'}
             >
               Tournament Info
-            </button>
-            <button
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link 
+              active={activeTab === 'playerDetails'} 
               onClick={() => setActiveTab('playerDetails')}
-              className={`${
-                activeTab === 'playerDetails'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={activeTab === 'playerDetails' ? 'text-white bg-primary' : 'text-light'}
             >
               Player Details
-            </button>
-            <button
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link 
+              active={activeTab === 'roster'} 
               onClick={() => setActiveTab('roster')}
-              className={`${
-                activeTab === 'roster'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={activeTab === 'roster' ? 'text-white bg-primary' : 'text-light'}
             >
               Roster
-            </button>
-            <button
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link 
+              active={activeTab === 'pairings'} 
               onClick={() => setActiveTab('pairings')}
-              className={`${
-                activeTab === 'pairings'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={activeTab === 'pairings' ? 'text-white bg-primary' : 'text-light'}
             >
               Pairings
-            </button>
-            <button
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link 
+              active={activeTab === 'placings'} 
               onClick={() => setActiveTab('placings')}
-              className={`${
-                activeTab === 'placings'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={activeTab === 'placings' ? 'text-white bg-primary' : 'text-light'}
             >
               Placings
-            </button>
-          </nav>
-        </div>
+            </Nav.Link>
+          </Nav.Item>
+        </Nav>
         
-        {/* Tab content */}
-        <div className="mt-6">
-          {renderTabContent()}
-        </div>
-      </div>
+        {/* Tab Content */}
+        {renderTabContent()}
+      </Container>
+
+      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary mt-auto">
+        <Container>
+          <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
+        </Container>
+      </footer>
     </div>
   );
 }

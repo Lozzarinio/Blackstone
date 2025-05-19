@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { Container, Navbar, Nav, Card, Button, Row, Col } from 'react-bootstrap';
 
 function Home() {
   const { currentUser, logout } = useAuth();
@@ -16,181 +17,146 @@ function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Blackstone</h1>
-          <div>
-            {currentUser ? (
-              <>
-                <span className="mr-4">{currentUser.email}</span>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                  Log Out
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => navigate('/login')}
-                className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                Log In
-              </button>
+    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+      {/* Navigation Bar */}
+      <Navbar bg="dark" variant="dark" expand="lg" className="border-bottom border-secondary">
+        <Container>
+          <Navbar.Brand href="/" className="fw-bold text-primary">BLACKSTONE</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between">
+            {currentUser && (
+              <Nav className="me-auto">
+                <Nav.Link href="/" active>Home</Nav.Link>
+                <Nav.Link href="/profile">Profile</Nav.Link>
+                <Nav.Link href="/tournaments">Tournaments</Nav.Link>
+                <Nav.Link href="/my-events">My Events</Nav.Link>
+              </Nav>
             )}
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Welcome Section */}
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg mb-6">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg leading-6 font-medium text-gray-900">
-                Welcome to Blackstone
-              </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Your tabletop wargaming tournament management platform.
-              </p>
-              <div className="mt-5">
-                <p className="text-sm text-gray-500">
-                  {currentUser 
-                    ? "Select an option below to get started." 
-                    : "Create an account or log in to access all features."}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Action Buttons */}
-          {currentUser ? (
-            // Logged-in users see these options
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* My Profile */}
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                      <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                    <div className="ml-5">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">My Profile</h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        View and edit your personal details
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-5">
-                    <button
-                      onClick={() => navigate('/profile')}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                    >
-                      View Profile
-                    </button>
-                  </div>
+            <Nav>
+              {currentUser ? (
+                <div className="d-flex align-items-center">
+                  <span className="me-3 text-light">{currentUser.email}</span>
+                  <Button variant="danger" onClick={handleLogout}>Log Out</Button>
                 </div>
-              </div>
+              ) : (
+                <Button variant="primary" onClick={() => navigate('/login')}>Log In</Button>
+              )}
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
 
-              {/* Search Events */}
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                      <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    </div>
-                    <div className="ml-5">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">Search Events</h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        Find upcoming tournaments
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-5">
-                    <button
-                      onClick={() => navigate('/tournaments')}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                    >
-                      Browse Events
-                    </button>
-                  </div>
-                </div>
-              </div>
+      <Container className="py-4 flex-grow-1">
+        {/* Welcome Section */}
+        <Card className="bg-dark text-light mb-4 border-secondary">
+          <Card.Body>
+            <Card.Title className="h3">Welcome to Blackstone</Card.Title>
+            <Card.Text className="text-light">
+              Your tabletop wargaming tournament management platform.
+            </Card.Text>
+            <Card.Text className="text-muted">
+              {currentUser 
+                ? "Select an option below to get started." 
+                : "Create an account or log in to access all features."}
+            </Card.Text>
+          </Card.Body>
+        </Card>
 
-              {/* My Events */}
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                      <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
+        {/* Main Content */}
+        {currentUser ? (
+          <Row xs={1} md={3} className="g-4">
+            {/* My Profile Card */}
+            <Col>
+              <Card className="h-100 bg-dark text-light border-secondary">
+                <Card.Body className="d-flex flex-column">
+                  <div className="d-flex align-items-center mb-3">
+                    <div className="bg-primary bg-opacity-25 p-3 rounded-circle me-3">
+                      <i className="bi bi-person text-primary fs-4"></i>
                     </div>
-                    <div className="ml-5">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">My Events</h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        View your registered tournaments
-                      </p>
+                    <Card.Title className="mb-0">My Profile</Card.Title>
+                  </div>
+                  <Card.Text className="flex-grow-1">
+                    View and edit your personal details, update your email, and manage your account settings.
+                  </Card.Text>
+                  <Button variant="primary" className="w-100" onClick={() => navigate('/profile')}>
+                    View Profile
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            {/* Search Events Card */}
+            <Col>
+              <Card className="h-100 bg-dark text-light border-secondary">
+                <Card.Body className="d-flex flex-column">
+                  <div className="d-flex align-items-center mb-3">
+                    <div className="bg-info bg-opacity-25 p-3 rounded-circle me-3">
+                      <i className="bi bi-search text-info fs-4"></i>
                     </div>
+                    <Card.Title className="mb-0">Search Events</Card.Title>
                   </div>
-                  <div className="mt-5">
-                    <button
-                      onClick={() => navigate('/my-events')}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                    >
-                      View My Events
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            // Non-logged in users see just the login button
-            <div className="max-w-md mx-auto">
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6 text-center">
-                  <div className="flex items-center justify-center mb-4">
-                    <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                      <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                      </svg>
+                  <Card.Text className="flex-grow-1">
+                    Browse upcoming tournaments, view details, and register to participate in wargaming events.
+                  </Card.Text>
+                  <Button variant="info" className="w-100 text-white" onClick={() => navigate('/tournaments')}>
+                    Browse Events
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            {/* My Events Card */}
+            <Col>
+              <Card className="h-100 bg-dark text-light border-secondary">
+                <Card.Body className="d-flex flex-column">
+                  <div className="d-flex align-items-center mb-3">
+                    <div className="bg-warning bg-opacity-25 p-3 rounded-circle me-3">
+                      <i className="bi bi-calendar-event text-warning fs-4"></i>
                     </div>
+                    <Card.Title className="mb-0">My Events</Card.Title>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Welcome to Blackstone</h3>
-                  <p className="text-gray-700 mb-6">Please log in to access all features and manage your tournaments.</p>
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                  >
+                  <Card.Text className="flex-grow-1">
+                    View your registered tournaments, check your pairings, and track your performance.
+                  </Card.Text>
+                  <Button variant="warning" className="w-100" onClick={() => navigate('/my-events')}>
+                    View My Events
+                  </Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        ) : (
+          <Row className="justify-content-center mt-5">
+            <Col md={6}>
+              <Card className="bg-dark text-light border-secondary text-center">
+                <Card.Body>
+                  <div className="d-inline-flex bg-primary bg-opacity-25 p-3 rounded-circle mb-4">
+                    <i className="bi bi-person-circle text-primary fs-1"></i>
+                  </div>
+                  <Card.Title className="h3 mb-3">Welcome, Commander</Card.Title>
+                  <Card.Text className="mb-4">
+                    Log in to access all features and manage your tournaments.
+                  </Card.Text>
+                  <Button variant="primary" size="lg" className="w-100 mb-3" onClick={() => navigate('/login')}>
                     Login
-                  </button>
-                  <p className="mt-4 text-sm text-gray-500">
+                  </Button>
+                  <Card.Text className="text-muted mt-3">
                     Don't have an account?{' '}
-                    <button 
-                      onClick={() => navigate('/signup')}
-                      className="text-indigo-600 hover:text-indigo-500"
-                    >
+                    <Button variant="link" className="p-0" onClick={() => navigate('/signup')}>
                       Sign up
-                    </button>
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
+                    </Button>
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        )}
+      </Container>
 
-      <footer className="bg-white border-t border-gray-200 mt-8">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} Blackstone. All rights reserved.
-          </p>
-        </div>
+      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+        <Container>
+          <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
+        </Container>
       </footer>
     </div>
   );
