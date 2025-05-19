@@ -65,64 +65,64 @@ function Home() {
           </div>
 
           {/* Main Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* My Profile */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                    <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+          {currentUser ? (
+            // Logged-in users see these options
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* My Profile */}
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                      <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <div className="ml-5">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">My Profile</h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        View and edit your personal details
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">My Profile</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      View and edit your personal details
-                    </p>
+                  <div className="mt-5">
+                    <button
+                      onClick={() => navigate('/profile')}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                    >
+                      View Profile
+                    </button>
                   </div>
-                </div>
-                <div className="mt-5">
-                  <button
-                    onClick={() => currentUser ? navigate('/profile') : navigate('/login')}
-                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                  >
-                    {currentUser ? "View Profile" : "Login to Access"}
-                  </button>
                 </div>
               </div>
-            </div>
 
-            {/* Search Events */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
-                    <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+              {/* Search Events */}
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                      <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-5">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">Search Events</h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Find upcoming tournaments
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">Search Events</h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Find upcoming tournaments
-                    </p>
+                  <div className="mt-5">
+                    <button
+                      onClick={() => navigate('/tournaments')}
+                      className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                    >
+                      Browse Events
+                    </button>
                   </div>
-                </div>
-                <div className="mt-5">
-                  <button
-                    onClick={() => currentUser ? navigate('/tournaments') : navigate('/login')}
-                    className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-                  >
-                    {currentUser ? "Browse Events" : "Login to Access"}
-                  </button>
                 </div>
               </div>
-            </div>
 
-            {/* Conditional: My Events OR Login */}
-            {currentUser ? (
-              // My Events for logged in users
+              {/* My Events */}
               <div className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex items-center">
@@ -148,35 +148,40 @@ function Home() {
                   </div>
                 </div>
               </div>
-            ) : (
-              // Login button for visitors
+            </div>
+          ) : (
+            // Non-logged in users see just the login button
+            <div className="max-w-md mx-auto">
               <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="flex items-center">
+                <div className="px-4 py-5 sm:p-6 text-center">
+                  <div className="flex items-center justify-center mb-4">
                     <div className="flex-shrink-0 bg-indigo-500 rounded-md p-3">
                       <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                       </svg>
                     </div>
-                    <div className="ml-5">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">Login</h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        Log in to your account or create one
-                      </p>
-                    </div>
                   </div>
-                  <div className="mt-5">
-                    <button
-                      onClick={() => navigate('/login')}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Welcome to Blackstone</h3>
+                  <p className="text-gray-700 mb-6">Please log in to access all features and manage your tournaments.</p>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+                  >
+                    Login
+                  </button>
+                  <p className="mt-4 text-sm text-gray-500">
+                    Don't have an account?{' '}
+                    <button 
+                      onClick={() => navigate('/signup')}
+                      className="text-indigo-600 hover:text-indigo-500"
                     >
-                      Login or Sign Up
+                      Sign up
                     </button>
-                  </div>
+                  </p>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </main>
 

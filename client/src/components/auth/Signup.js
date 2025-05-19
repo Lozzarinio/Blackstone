@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { createUserProfile } from '../../services/databaseService';
 
 function Signup() {
   const [email, setEmail] = useState('');
@@ -13,20 +14,33 @@ function Signup() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
+  
     if (password !== passwordConfirm) {
       return setError('Passwords do not match');
     }
-
+  
     try {
       setError('');
       setLoading(true);
-      await signup(email, password);
+      
+      // Sign up with Firebase Auth
+      const userCredential = await signup(email, password);
+      
+      // Create a user profile document in Firestore
+      await createUserProfile(userCredential.user.uid, {
+        email: email,
+        firstName: '',
+        lastName: '',
+        teamName: '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
       navigate('/'); // Navigate to home page after successful signup
     } catch (error) {
       setError('Failed to create an account: ' + error.message);
     }
-
+  
     setLoading(false);
   }
 

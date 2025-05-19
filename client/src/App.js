@@ -8,6 +8,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import TournamentList from './components/tournaments/TournamentList';
 import TournamentDetails from './components/tournaments/TournamentDetails';
 import Home from './components/home/Home';
+import MyEvents from './components/events/MyEvents';
 import Profile from './components/profile/Profile';
 import './App.css';
 
@@ -65,6 +66,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              } 
+            />
+
+            <Route 
+              path="/my-events" 
+              element={
+                <PrivateRoute>
+                  <MyEvents />
                 </PrivateRoute>
               } 
             />

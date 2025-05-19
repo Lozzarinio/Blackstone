@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUserProfile, updateUserProfile } from '../../services/databaseService';
+import { getUserProfile, updateUserProfile, createUserProfile } from '../../services/databaseService';
 
 function Profile() {
   const { currentUser, updateEmail, updatePassword } = useAuth();
@@ -25,26 +25,58 @@ function Profile() {
         navigate('/login');
         return;
       }
-
+    
       try {
         setLoading(true);
-        const profileData = await getUserProfile(currentUser.uid);
+        console.log("Current user ID:", currentUser.uid);
         
-        if (profileData) {
-          setFirstName(profileData.firstName || '');
-          setLastName(profileData.lastName || '');
-          setTeamName(profileData.teamName || '');
+        let profileData = await getUserProfile(currentUser.uid);
+        console.log("Profile data retrieved:", profileData);
+        
+        // If no profile document exists, create one
+        if (!profileData) {
+          console.log("No profile found, creating new profile");
+          const newProfileData = {
+            email: currentUser.email,
+            firstName: '',
+            lastName: '', 
+            teamName: '',
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          
+          await createUserProfile(currentUser.uid, newProfileData);
+          console.log("New profile created");
+          
+          // Fetch the newly created profile
+          profileData = await getUserProfile(currentUser.uid);
+          console.log("Refetched profile data:", profileData);
         }
         
+        // Set form fields with profile data
+        console.log("Setting form fields with:", profileData);
+        setFirstName(profileData?.firstName || '');
+        setLastName(profileData?.lastName || '');
+        setTeamName(profileData?.teamName || '');
         setEmail(currentUser.email || '');
+        
         setLoading(false);
+        
+        // Log state after update (this will be one render cycle behind)
+        console.log("Current state after setting:", { firstName, lastName, teamName });
+        
+        // Add a slight delay and log again to see state after it updates
+        setTimeout(() => {
+          console.log("State after timeout:", { firstName, lastName, teamName });
+        }, 500);
+        
       } catch (error) {
         console.error('Error loading profile:', error);
         setError('Failed to load profile: ' + error.message);
         setLoading(false);
       }
     };
-
+  
     fetchUserProfile();
   }, [currentUser, navigate]);
 

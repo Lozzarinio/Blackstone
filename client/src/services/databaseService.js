@@ -267,10 +267,16 @@ export const createUserProfile = async (userId, userData) => {
 
 export const getUserProfile = async (userId) => {
   try {
+    console.log("Fetching user profile for ID:", userId);
     const userDoc = await getDoc(doc(db, 'users', userId));
+    console.log("User document exists:", userDoc.exists());
+    
     if (userDoc.exists()) {
-      return { id: userDoc.id, ...userDoc.data() };
+      const data = userDoc.data();
+      console.log("User document data:", data);
+      return { id: userDoc.id, ...data };
     } else {
+      console.log("No user document found");
       return null;
     }
   } catch (error) {
@@ -288,6 +294,55 @@ export const updateUserProfile = async (userId, profileData) => {
     return true;
   } catch (error) {
     console.error('Error updating user profile:', error);
+    throw error;
+  }
+};
+
+export const getUserEvents = async (userId) => {
+  try {
+    // First, get all participants entries for this user
+    const participantsQuery = query(
+      collection(db, 'participants'),
+      where('userId', '==', userId)
+    );
+    
+    const participantsSnapshot = await getDocs(participantsQuery);
+    
+    if (participantsSnapshot.empty) {
+      return [];
+    }
+    
+    // Extract tournament IDs
+    const tournamentIds = participantsSnapshot.docs.map(doc => doc.data().tournamentId);
+    
+    // Fetch all these tournaments
+    const tournaments = [];
+    
+    // Firebase doesn't support 'in' queries with more than 10 items, so we'll do it in batches if needed
+    const batches = [];
+    for (let i = 0; i < tournamentIds.length; i += 10) {
+      batches.push(tournamentIds.slice(i, i + 10));
+    }
+    
+    for (const batch of batches) {
+      const tournamentsQuery = query(
+        collection(db, 'tournaments'),
+        where('__name__', 'in', batch)
+      );
+      
+      const tournamentsSnapshot = await getDocs(tournamentsQuery);
+      
+      tournamentsSnapshot.docs.forEach(doc => {
+        tournaments.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+    }
+    
+    return tournaments;
+  } catch (error) {
+    console.error('Error fetching user events:', error);
     throw error;
   }
 };
