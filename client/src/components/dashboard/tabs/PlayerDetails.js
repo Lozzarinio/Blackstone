@@ -6,6 +6,7 @@ import {
   updateParticipationStatus,
   getParticipantProfile
 } from '../../../services/databaseService';
+import { Card, Form, Button, Row, Col, Alert, Spinner, Badge } from 'react-bootstrap';
 
 function PlayerDetails({ participantProfile, tournamentId }) {
   const { currentUser } = useAuth();
@@ -28,6 +29,7 @@ function PlayerDetails({ participantProfile, tournamentId }) {
     if (!currentUser || !tournamentId) return;
     
     try {
+      setLoading(true);
       const freshProfile = await getParticipantProfile(currentUser.uid, tournamentId);
       if (freshProfile) {
         setProfile(freshProfile);
@@ -40,8 +42,10 @@ function PlayerDetails({ participantProfile, tournamentId }) {
         setParticipationStatus(freshProfile.participationStatus || 'registered');
         console.log('Loaded profile data:', freshProfile);
       }
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching fresh profile data:', error);
+      setLoading(false);
     }
   };
 
@@ -140,182 +144,191 @@ function PlayerDetails({ participantProfile, tournamentId }) {
     }
   };
 
+  if (loading && !profile && !participantProfile) {
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Player Details</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Loading player details...</p>
+        </Card.Body>
+      </Card>
+    );
+  }
+
   if (!profile && !participantProfile) {
-    return <div className="text-center py-10">No participant profile found. Please register for a tournament first.</div>;
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Player Details</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <p className="mb-0">No participant profile found. Please register for a tournament first.</p>
+        </Card.Body>
+      </Card>
+    );
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Player Details</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">Your personal details and army information.</p>
-      </div>
+    <Card className="shadow">
+      <Card.Header className="bg-light">
+        <h3 className="mb-0">Player Details</h3>
+        <p className="text-muted mb-0">Your personal details and army information.</p>
+      </Card.Header>
       
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mx-4 mb-4 rounded relative">
-          {error}
-        </div>
-      )}
-      
-      {success && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 mx-4 mb-4 rounded relative">
-          {success}
-        </div>
-      )}
-      
-      <div className="border-t border-gray-200">
-        <form onSubmit={handleSubmit}>
-          <div className="px-4 py-5 sm:p-6">
-            <div className="grid grid-cols-6 gap-6">
-              <div className="col-span-6 sm:col-span-3">
-                <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                  First name
-                </label>
-                <input
+      <Card.Body>
+        {error && (
+          <Alert variant="danger" className="mb-4">
+            {error}
+          </Alert>
+        )}
+        
+        {success && (
+          <Alert variant="success" className="mb-4">
+            {success}
+          </Alert>
+        )}
+        
+        <Form onSubmit={handleSubmit}>
+          <h4 className="border-bottom pb-2 mb-4">Personal Information</h4>
+          
+          <Row>
+            <Col md={6} className="mb-3">
+              <Form.Group controlId="firstName">
+                <Form.Label>First name</Form.Label>
+                <Form.Control
                   type="text"
-                  name="first-name"
-                  id="first-name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Enter your first name"
                 />
-              </div>
+              </Form.Group>
+            </Col>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
-                  Last name
-                </label>
-                <input
+            <Col md={6} className="mb-3">
+              <Form.Group controlId="lastName">
+                <Form.Label>Last name</Form.Label>
+                <Form.Control
                   type="text"
-                  name="last-name"
-                  id="last-name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Enter your last name"
                 />
-              </div>
+              </Form.Group>
+            </Col>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label htmlFor="team-name" className="block text-sm font-medium text-gray-700">
-                  Team name
-                </label>
-                <input
+            <Col md={6} className="mb-3">
+              <Form.Group controlId="teamName">
+                <Form.Label>Team name</Form.Label>
+                <Form.Control
                   type="text"
-                  name="team-name"
-                  id="team-name"
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
-                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Enter your team name"
                 />
-              </div>
+              </Form.Group>
+            </Col>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label htmlFor="faction" className="block text-sm font-medium text-gray-700">
-                  Faction
-                </label>
-                <input
+            <Col md={6} className="mb-3">
+              <Form.Group controlId="faction">
+                <Form.Label>Faction</Form.Label>
+                <Form.Control
                   type="text"
-                  name="faction"
-                  id="faction"
                   value={faction}
                   onChange={(e) => setFaction(e.target.value)}
-                  className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  placeholder="Enter your faction"
                 />
-              </div>
+              </Form.Group>
+            </Col>
+          </Row>
 
-              <div className="col-span-6">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  {loading ? 'Saving...' : 'Save Details'}
-                </button>
-              </div>
-            </div>
+          <div className="d-flex justify-content-end mt-3 mb-4">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : 'Save Details'}
+            </Button>
           </div>
-        </form>
+        </Form>
         
         {/* Army List Section */}
-        <div className="px-4 py-5 sm:p-6 border-t border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Army List</h3>
-          <p className="mb-4 text-sm text-gray-500">
-            List Status: <span className={`font-semibold ${
-              listStatus === 'submitted' ? 'text-green-600' : 
-              listStatus === 'submittedWithErrors' ? 'text-red-600' : 
-              'text-yellow-600'
-            }`}>
-              {listStatus === 'submitted' ? 'Submitted' : 
-               listStatus === 'submittedWithErrors' ? 'Submitted with Errors' : 
-               'Not Submitted'}
-            </span>
+        <hr />
+        <h4 className="mb-4">Army List</h4>
+        <div className="mb-3">
+          <p className="mb-2">
+            List Status: {' '}
+            {listStatus === 'submitted' ? (
+              <Badge bg="success">Submitted</Badge>
+            ) : listStatus === 'submittedWithErrors' ? (
+              <Badge bg="danger">Submitted with Errors</Badge>
+            ) : (
+              <Badge bg="warning">Not Submitted</Badge>
+            )}
           </p>
           
-          <div className="mb-4">
-            <label htmlFor="army-list" className="block text-sm font-medium text-gray-700 mb-2">
-              Paste your army list here
-            </label>
-            <textarea
-              id="army-list"
-              name="army-list"
+          <Form.Group className="mb-3">
+            <Form.Label>Paste your army list here</Form.Label>
+            <Form.Control
+              as="textarea"
               rows={10}
               value={armyList}
               onChange={(e) => setArmyList(e.target.value)}
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              placeholder="Enter your army list details here..."
             />
-          </div>
+          </Form.Group>
           
-          <button
-            type="button"
-            onClick={handleArmyListSubmit}
-            disabled={loading || !armyList.trim()}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            {loading ? 'Submitting...' : 'Submit Army List'}
-          </button>
+          <div className="d-flex justify-content-end">
+            <Button
+              variant="primary"
+              onClick={handleArmyListSubmit}
+              disabled={loading || !armyList.trim()}
+            >
+              {loading ? 'Submitting...' : 'Submit Army List'}
+            </Button>
+          </div>
         </div>
         
         {/* Tournament Status Section */}
-        <div className="px-4 py-5 sm:p-6 border-t border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Tournament Status</h3>
-          <p className="mb-4 text-sm text-gray-500">
-            Current Status: <span className={`font-semibold ${
-              participationStatus === 'checkedIn' ? 'text-green-600' : 
-              participationStatus === 'dropped' ? 'text-red-600' : 
-              'text-yellow-600'
-            }`}>
-              {participationStatus === 'checkedIn' ? 'Checked In' : 
-               participationStatus === 'dropped' ? 'Dropped' : 
-               'Registered'}
-            </span>
-          </p>
+        <hr />
+        <h4 className="mb-4">Tournament Status</h4>
+        <p className="mb-3">
+          Current Status: {' '}
+          {participationStatus === 'checkedIn' ? (
+            <Badge bg="success">Checked In</Badge>
+          ) : participationStatus === 'dropped' ? (
+            <Badge bg="danger">Dropped</Badge>
+          ) : (
+            <Badge bg="warning">Registered</Badge>
+          )}
+        </p>
+        
+        <div className="d-flex gap-2">
+          {participationStatus !== 'checkedIn' && (
+            <Button
+              variant="success"
+              onClick={() => handleStatusChange('checkedIn')}
+              disabled={loading}
+            >
+              Check In
+            </Button>
+          )}
           
-          <div className="flex space-x-4">
-            {participationStatus !== 'checkedIn' && (
-              <button
-                type="button"
-                onClick={() => handleStatusChange('checkedIn')}
-                disabled={loading}
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                Check In
-              </button>
-            )}
-            
-            {participationStatus !== 'dropped' && (
-              <button
-                type="button"
-                onClick={() => handleStatusChange('dropped')}
-                disabled={loading}
-                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                Drop from Tournament
-              </button>
-            )}
-          </div>
+          {participationStatus !== 'dropped' && (
+            <Button
+              variant="danger"
+              onClick={() => handleStatusChange('dropped')}
+              disabled={loading}
+            >
+              Drop from Tournament
+            </Button>
+          )}
         </div>
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 }
 

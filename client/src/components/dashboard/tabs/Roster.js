@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getTournamentRoster } from '../../../services/databaseService';
+import { Card, Table, Badge, Button, Spinner } from 'react-bootstrap';
 
 function Roster({ tournamentId }) {
   const [participants, setParticipants] = useState([]);
@@ -28,102 +29,99 @@ function Roster({ tournamentId }) {
     fetchParticipants();
   }, [tournamentId]);
 
-  const getStatusColor = (status) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'checkedIn':
-        return 'bg-green-100 text-green-800';
+        return <Badge bg="success">Checked In</Badge>;
       case 'registered':
-        return 'bg-yellow-100 text-yellow-800';
+        return <Badge bg="warning">Registered</Badge>;
       case 'dropped':
-        return 'bg-red-100 text-red-800';
+        return <Badge bg="danger">Dropped</Badge>;
       default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'checkedIn':
-        return 'Checked In';
-      case 'registered':
-        return 'Registered';
-      case 'dropped':
-        return 'Dropped';
-      default:
-        return 'Unknown';
+        return <Badge bg="secondary">Unknown</Badge>;
     }
   };
 
   if (loading) {
-    return <div className="text-center py-10">Loading roster...</div>;
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Roster</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Loading roster...</p>
+        </Card.Body>
+      </Card>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 text-center py-10">{error}</div>;
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Roster</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <div className="text-danger">{error}</div>
+        </Card.Body>
+      </Card>
+    );
   }
 
   if (!tournamentId) {
-    return <div className="text-center py-10">No tournament selected.</div>;
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Roster</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <p>No tournament selected.</p>
+        </Card.Body>
+      </Card>
+    );
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Tournament Roster</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">
+    <Card className="shadow">
+      <Card.Header className="bg-light">
+        <h3 className="mb-0">Tournament Roster</h3>
+        <p className="text-muted mb-0">
           {participants.length} {participants.length === 1 ? 'player' : 'players'} registered for this tournament.
         </p>
-      </div>
+      </Card.Header>
       
       {participants.length === 0 ? (
-        <div className="border-t border-gray-200 px-4 py-5 text-center text-gray-500">
-          No participants have registered for this tournament yet.
-        </div>
+        <Card.Body className="text-center py-5">
+          <p className="mb-0">No participants have registered for this tournament yet.</p>
+        </Card.Body>
       ) : (
-        <div className="border-t border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+        <Card.Body>
+          <div className="table-responsive">
+            <Table bordered hover className="mb-0">
+              <thead>
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Player
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Team
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Faction
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Army List
-                  </th>
+                  <th>Player</th>
+                  <th>Team</th>
+                  <th>Faction</th>
+                  <th>Status</th>
+                  <th>Army List</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody>
                 {participants.map((participant) => (
                   <tr key={participant.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {participant.firstName} {participant.lastName}
-                      </div>
+                    <td className="fw-medium">
+                      {participant.firstName} {participant.lastName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{participant.teamName || '-'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{participant.faction || '-'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(participant.participationStatus)}`}>
-                        {getStatusText(participant.participationStatus)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td>{participant.teamName || '-'}</td>
+                    <td>{participant.faction || '-'}</td>
+                    <td>{getStatusBadge(participant.participationStatus)}</td>
+                    <td className="text-center">
                       {participant.armyList ? (
-                        <button 
+                        <Button 
+                          variant="outline-primary"
+                          size="sm"
                           onClick={() => {
                             const newWindow = window.open('', '_blank');
                             newWindow.document.write(`
@@ -145,22 +143,21 @@ function Roster({ tournamentId }) {
                             `);
                             newWindow.document.close();
                           }}
-                          className="text-indigo-600 hover:text-indigo-900"
                         >
                           View List
-                        </button>
+                        </Button>
                       ) : (
-                        <span className="text-gray-400">Not submitted</span>
+                        <span className="text-muted">Not submitted</span>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </Table>
           </div>
-        </div>
+        </Card.Body>
       )}
-    </div>
+    </Card>
   );
 }
 

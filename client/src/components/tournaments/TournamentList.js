@@ -101,11 +101,12 @@ function TournamentList() {
   };
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+    // Removed bg-dark text-light classes
+    <div className="min-vh-100 d-flex flex-column">
+      {/* Changed navbar from dark to primary */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <Container>
-          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <span className="navbar-brand fw-bold">BLACKSTONE</span>
           <button
             onClick={() => navigate('/')}
             className="btn btn-outline-light"
@@ -122,10 +123,11 @@ function TournamentList() {
             <p className="text-muted">Browse and register for upcoming tournaments</p>
           </div>
           <div className="d-flex gap-2">
-            <Button variant="outline-light" size="sm">
+            {/* Changed button from outline-light to outline-primary */}
+            <Button variant="outline-primary" size="sm">
               <i className="bi bi-funnel me-1"></i> Filter
             </Button>
-            <Button variant="outline-light" size="sm">
+            <Button variant="outline-primary" size="sm">
               <i className="bi bi-sort-down me-1"></i> Sort
             </Button>
           </div>
@@ -149,7 +151,8 @@ function TournamentList() {
             <p className="mt-3">Loading tournaments...</p>
           </div>
         ) : tournaments.length === 0 ? (
-          <Card className="bg-dark border-secondary">
+          {/* Removed dark theme styling from Card */}
+          <Card className="shadow">
             <Card.Body className="text-center py-5">
               <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
               <h3 className="mt-3">No tournaments available</h3>
@@ -160,7 +163,8 @@ function TournamentList() {
           <Row>
             {tournaments.map((tournament) => (
               <Col xs={12} className="mb-4" key={tournament.id}>
-                <Card className="bg-dark border-secondary h-100">
+                {/* Removed dark theme styling from Card */}
+                <Card className="h-100 shadow">
                   <Card.Body>
                     <div className="d-flex flex-column flex-md-row justify-content-between">
                       <div className="mb-3 mb-md-0">
@@ -204,8 +208,9 @@ function TournamentList() {
                           >
                             {registering ? 'Registering...' : 'Register'}
                           </Button>
+                          {/* Changed button from outline-light to outline-primary */}
                           <Button 
-                            variant="outline-light"
+                            variant="outline-primary"
                             onClick={() => handleViewDetails(tournament.id)}
                           >
                             View Details
@@ -221,7 +226,8 @@ function TournamentList() {
         )}
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary mt-auto">
+      {/* Changed footer from dark to light theme */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>

@@ -101,11 +101,12 @@ function TournamentDetails() {
   };
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+    // Removed bg-dark text-light classes
+    <div className="min-vh-100 d-flex flex-column">
+      {/* Changed navbar from dark to primary */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <Container>
-          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <span className="navbar-brand fw-bold">BLACKSTONE</span>
           <button
             onClick={() => navigate('/tournaments')}
             className="btn btn-outline-light"
@@ -134,7 +135,8 @@ function TournamentDetails() {
             <p className="mt-3">Loading tournament details...</p>
           </div>
         ) : !tournament ? (
-          <Card className="bg-dark border-secondary">
+          {/* Removed dark theme styling from Card */}
+          <Card className="shadow">
             <Card.Body className="text-center py-5">
               <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
               <h3 className="mt-3">Tournament Not Found</h3>
@@ -180,8 +182,9 @@ function TournamentDetails() {
 
             <Row className="mb-4">
               <Col lg={8}>
-                <Card className="bg-dark border-secondary mb-4">
-                  <Card.Header className="bg-dark border-secondary">
+                {/* Removed dark theme styling from Card */}
+                <Card className="shadow mb-4">
+                  <Card.Header className="bg-light">
                     <h4 className="mb-0">Tournament Details</h4>
                   </Card.Header>
                   <Card.Body>
@@ -233,8 +236,9 @@ function TournamentDetails() {
                   </Card.Body>
                 </Card>
 
-                <Card className="bg-dark border-secondary">
-                  <Card.Header className="bg-dark border-secondary">
+                {/* Removed dark theme styling from Card */}
+                <Card className="shadow">
+                  <Card.Header className="bg-light">
                     <h4 className="mb-0">Event Rules</h4>
                   </Card.Header>
                   <Card.Body>
@@ -250,8 +254,9 @@ function TournamentDetails() {
               </Col>
 
               <Col lg={4}>
-                <Card className="bg-dark border-secondary mb-4">
-                  <Card.Header className="bg-dark border-secondary">
+                {/* Removed dark theme styling from Card */}
+                <Card className="shadow mb-4">
+                  <Card.Header className="bg-light">
                     <h4 className="mb-0">Location</h4>
                   </Card.Header>
                   <Card.Body>
@@ -288,8 +293,9 @@ function TournamentDetails() {
                   </Card.Body>
                 </Card>
 
-                <Card className="bg-dark border-secondary">
-                  <Card.Header className="bg-dark border-secondary">
+                {/* Removed dark theme styling from Card */}
+                <Card className="shadow">
+                  <Card.Header className="bg-light">
                     <h4 className="mb-0">Organizer</h4>
                   </Card.Header>
                   <Card.Body>
@@ -330,7 +336,8 @@ function TournamentDetails() {
         )}
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary mt-auto">
+      {/* Changed footer from dark to light theme */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>

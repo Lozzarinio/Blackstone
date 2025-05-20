@@ -27,11 +27,13 @@ function Login() {
   }
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
+    // Removed bg-dark text-light classes
+    <div className="min-vh-100 d-flex flex-column">
       <Container className="py-5 flex-grow-1 d-flex align-items-center justify-content-center">
         <Row className="justify-content-center w-100">
           <Col xs={12} md={8} lg={6} xl={5}>
-            <Card className="bg-dark text-light border-secondary">
+            {/* Removed dark theme styling from Card */}
+            <Card className="shadow">
               <Card.Body className="p-5">
                 <div className="text-center mb-4">
                   <h2 className="fw-bold text-primary">BLACKSTONE</h2>
@@ -43,23 +45,23 @@ function Login() {
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-4" controlId="email">
                     <Form.Label>Email address</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
 
                   <Form.Group className="mb-4" controlId="password">
                     <Form.Label>Password</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
 
@@ -87,8 +89,9 @@ function Login() {
                       Don't have an account?{' '}
                       <Link to="/signup" className="text-primary">Sign up</Link>
                     </p>
+                    {/* Changed from outline-secondary to outline-primary */}
                     <Button
-                      variant="outline-secondary"
+                      variant="outline-primary"
                       className="mt-3"
                       onClick={() => navigate('/')}
                     >
@@ -102,7 +105,8 @@ function Login() {
         </Row>
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+      {/* Changed footer from dark to light theme */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>

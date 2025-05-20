@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getRoundPairings } from '../../../services/databaseService';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Card, Button, Spinner, Row, Col } from 'react-bootstrap';
 
 function Pairings({ tournamentId }) {
   const [pairings, setPairings] = useState([]);
@@ -53,98 +54,125 @@ function Pairings({ tournamentId }) {
   const userPairing = findUserPairing();
 
   if (loading && pairings.length === 0) {
-    return <div className="text-center py-10">Loading pairings...</div>;
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Pairings</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Loading pairings...</p>
+        </Card.Body>
+      </Card>
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 text-center py-10">{error}</div>;
+    return (
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Pairings</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <div className="text-danger">{error}</div>
+        </Card.Body>
+      </Card>
+    );
   }
 
   if (pairings.length === 0) {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Tournament Pairings</h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">Pairings have not been generated yet for round {currentRound}.</p>
-        </div>
-      </div>
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Pairings</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <p className="mb-0">Pairings have not been generated yet for round {currentRound}.</p>
+        </Card.Body>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Tournament Pairings</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">Current pairings for round {currentRound}.</p>
-      </div>
+    <Card className="shadow">
+      <Card.Header className="bg-light">
+        <h3 className="mb-0">Tournament Pairings</h3>
+        <p className="text-muted mb-0">Current pairings for round {currentRound}.</p>
+      </Card.Header>
       
-      <div className="px-4 py-3 bg-gray-50 border-t border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <button
+      <div className="p-3 bg-light border-top border-bottom">
+        <div className="d-flex align-items-center justify-content-between">
+          <div className="d-flex align-items-center">
+            <Button
               onClick={() => handleRoundChange(currentRound - 1)}
               disabled={currentRound === 1 || loading}
-              className={`px-3 py-1 rounded ${
-                currentRound === 1 || loading
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
-              }`}
+              variant="outline-primary"
+              size="sm"
+              className="me-2"
             >
               Previous
-            </button>
+            </Button>
             
-            <span className="text-sm font-medium">
+            <span className="fw-medium">
               Round {currentRound} of {totalRounds}
             </span>
             
-            <button
+            <Button
               onClick={() => handleRoundChange(currentRound + 1)}
               disabled={currentRound === totalRounds || loading}
-              className={`px-3 py-1 rounded ${
-                currentRound === totalRounds || loading
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-indigo-600 text-white hover:bg-indigo-700'
-              }`}
+              variant="outline-primary"
+              size="sm"
+              className="ms-2"
             >
               Next
-            </button>
+            </Button>
           </div>
           
           {loading && (
-            <span className="text-sm text-gray-500">Loading...</span>
+            <Spinner animation="border" variant="primary" size="sm" />
           )}
         </div>
       </div>
       
       {/* User's pairing highlighted at the top if found */}
       {userPairing && (
-        <div className="border-t border-gray-200 bg-yellow-50">
-          <div className="px-4 py-3 sm:px-6">
-            <h4 className="text-sm font-medium text-gray-900">Your Match</h4>
-          </div>
-          <div className="px-4 py-5 sm:p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <div className="mb-4 md:mb-0 flex items-center">
-                <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full text-xl font-bold">
-                  {userPairing.tableNumber}
+        <div className="border-bottom bg-light-yellow">
+          <Card.Header className="bg-light border-0">
+            <h5 className="mb-0">Your Match</h5>
+          </Card.Header>
+          <Card.Body className="pt-2">
+            <div className="d-flex flex-column mb-3">
+              <div className="d-flex align-items-center mb-3">
+                <div className="d-flex align-items-center justify-content-center bg-primary text-white rounded-circle" 
+                     style={{ width: '3rem', height: '3rem' }}>
+                  <span className="fw-bold">{userPairing.tableNumber}</span>
                 </div>
-                <div className="ml-4">
-                  <h4 className="text-lg font-medium">Table {userPairing.tableNumber}</h4>
-                  <p className="text-sm text-gray-500">Round {currentRound}</p>
+                <div className="ms-3">
+                  <h5 className="mb-0">Table {userPairing.tableNumber}</h5>
+                  <small className="text-muted">Round {currentRound}</small>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                {/* Player 1 */}
-                <div className={`text-center ${userPairing.player1?.userId === currentUser.uid ? 'font-bold' : ''}`}>
-                  <div className="font-medium">
-                    {userPairing.player1?.firstName} {userPairing.player1?.lastName}
-                  </div>
-                  <div className="text-sm text-gray-500">{userPairing.player1?.faction || 'Unknown Faction'}</div>
-                  <div className="mt-1">
-                    <button 
-                      onClick={() => {
-                        if (userPairing.player1?.armyList) {
+            </div>
+            
+            <Row className="text-center g-3">
+              {/* Player 1 */}
+              <Col md={5}>
+                <Card className={userPairing.player1?.userId === currentUser.uid ? 'border-primary' : ''}>
+                  <Card.Body>
+                    <h5>
+                      {userPairing.player1?.userId === currentUser.uid && (
+                        <span className="text-primary">YOU: </span>
+                      )}
+                      {userPairing.player1?.firstName} {userPairing.player1?.lastName}
+                    </h5>
+                    <div className="text-muted">{userPairing.player1?.faction || 'Unknown Faction'}</div>
+                    {userPairing.player1?.armyList && (
+                      <Button 
+                        variant="outline-primary"
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => {
+                          // Army list popup opening code
                           const newWindow = window.open('', '_blank');
                           newWindow.document.write(`
                             <html>
@@ -164,31 +192,38 @@ function Pairings({ tournamentId }) {
                             </html>
                           `);
                           newWindow.document.close();
-                        }
-                      }}
-                      disabled={!userPairing.player1?.armyList}
-                      className={`text-xs ${userPairing.player1?.armyList ? 'text-indigo-600 hover:text-indigo-900' : 'text-gray-400 cursor-not-allowed'}`}
-                    >
-                      View Army List
-                    </button>
-                  </div>
-                </div>
-                
-                {/* VS */}
-                <div className="text-center">
-                  <div className="font-bold text-lg">VS</div>
-                </div>
-                
-                {/* Player 2 */}
-                <div className={`text-center ${userPairing.player2?.userId === currentUser.uid ? 'font-bold' : ''}`}>
-                  <div className="font-medium">
-                    {userPairing.player2?.firstName} {userPairing.player2?.lastName}
-                  </div>
-                  <div className="text-sm text-gray-500">{userPairing.player2?.faction || 'Unknown Faction'}</div>
-                  <div className="mt-1">
-                    <button 
-                      onClick={() => {
-                        if (userPairing.player2?.armyList) {
+                        }}
+                      >
+                        View Army List
+                      </Button>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
+              
+              {/* VS */}
+              <Col md={2} className="d-flex align-items-center justify-content-center">
+                <div className="fw-bold h4 mb-0">VS</div>
+              </Col>
+              
+              {/* Player 2 */}
+              <Col md={5}>
+                <Card className={userPairing.player2?.userId === currentUser.uid ? 'border-primary' : ''}>
+                  <Card.Body>
+                    <h5>
+                      {userPairing.player2?.userId === currentUser.uid && (
+                        <span className="text-primary">YOU: </span>
+                      )}
+                      {userPairing.player2?.firstName} {userPairing.player2?.lastName}
+                    </h5>
+                    <div className="text-muted">{userPairing.player2?.faction || 'Unknown Faction'}</div>
+                    {userPairing.player2?.armyList && (
+                      <Button 
+                        variant="outline-primary"
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => {
+                          // Army list popup opening code
                           const newWindow = window.open('', '_blank');
                           newWindow.document.write(`
                             <html>
@@ -208,48 +243,51 @@ function Pairings({ tournamentId }) {
                             </html>
                           `);
                           newWindow.document.close();
-                        }
-                      }}
-                      disabled={!userPairing.player2?.armyList}
-                      className={`text-xs ${userPairing.player2?.armyList ? 'text-indigo-600 hover:text-indigo-900' : 'text-gray-400 cursor-not-allowed'}`}
-                    >
-                      View Army List
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                        }}
+                      >
+                        View Army List
+                      </Button>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </Card.Body>
         </div>
       )}
       
       {/* All pairings list */}
-      <div className="border-t border-gray-200">
-        <div className="divide-y divide-gray-200">
+      <Card.Body>
+        <div className="d-flex flex-column gap-4">
           {pairings.map((pairing) => (
-            <div key={pairing.id} className="px-4 py-5 sm:p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div className="mb-4 md:mb-0 flex items-center">
-                  <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full text-xl font-bold">
-                    {pairing.tableNumber}
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="text-lg font-medium">Table {pairing.tableNumber}</h4>
-                    <p className="text-sm text-gray-500">Round {currentRound}</p>
+            <div key={pairing.id} className="card">
+              <div className="card-body">
+                <div className="d-flex flex-column mb-3">
+                  <div className="d-flex align-items-center mb-3">
+                    <div className="d-flex align-items-center justify-content-center bg-primary text-white rounded-circle" 
+                         style={{ width: '3rem', height: '3rem' }}>
+                      <span className="fw-bold">{pairing.tableNumber}</span>
+                    </div>
+                    <div className="ms-3">
+                      <h5 className="mb-0">Table {pairing.tableNumber}</h5>
+                      <small className="text-muted">Round {currentRound}</small>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                <Row className="text-center g-3">
                   {/* Player 1 */}
-                  <div className="text-center">
-                    <div className="font-medium">
-                      {pairing.player1?.firstName} {pairing.player1?.lastName}
-                    </div>
-                    <div className="text-sm text-gray-500">{pairing.player1?.faction || 'Unknown Faction'}</div>
-                    <div className="mt-1">
-                      <button 
-                        onClick={() => {
-                          if (pairing.player1?.armyList) {
+                  <Col md={5}>
+                    <div>
+                      <h5>{pairing.player1?.firstName} {pairing.player1?.lastName}</h5>
+                      <div className="text-muted">{pairing.player1?.faction || 'Unknown Faction'}</div>
+                      {pairing.player1?.armyList && (
+                        <Button 
+                          variant="outline-primary"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => {
+                            // Army list popup opening code
                             const newWindow = window.open('', '_blank');
                             newWindow.document.write(`
                               <html>
@@ -269,31 +307,31 @@ function Pairings({ tournamentId }) {
                               </html>
                             `);
                             newWindow.document.close();
-                          }
-                        }}
-                        disabled={!pairing.player1?.armyList}
-                        className={`text-xs ${pairing.player1?.armyList ? 'text-indigo-600 hover:text-indigo-900' : 'text-gray-400 cursor-not-allowed'}`}
-                      >
-                        View Army List
-                      </button>
+                          }}
+                        >
+                          View Army List
+                        </Button>
+                      )}
                     </div>
-                  </div>
+                  </Col>
                   
                   {/* VS */}
-                  <div className="text-center">
-                    <div className="font-bold text-lg">VS</div>
-                  </div>
+                  <Col md={2} className="d-flex align-items-center justify-content-center">
+                    <div className="fw-bold h4 mb-0">VS</div>
+                  </Col>
                   
                   {/* Player 2 */}
-                  <div className="text-center">
-                    <div className="font-medium">
-                      {pairing.player2?.firstName} {pairing.player2?.lastName}
-                    </div>
-                    <div className="text-sm text-gray-500">{pairing.player2?.faction || 'Unknown Faction'}</div>
-                    <div className="mt-1">
-                      <button 
-                        onClick={() => {
-                          if (pairing.player2?.armyList) {
+                  <Col md={5}>
+                    <div>
+                      <h5>{pairing.player2?.firstName} {pairing.player2?.lastName}</h5>
+                      <div className="text-muted">{pairing.player2?.faction || 'Unknown Faction'}</div>
+                      {pairing.player2?.armyList && (
+                        <Button 
+                          variant="outline-primary"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => {
+                            // Army list popup opening code
                             const newWindow = window.open('', '_blank');
                             newWindow.document.write(`
                               <html>
@@ -313,22 +351,20 @@ function Pairings({ tournamentId }) {
                               </html>
                             `);
                             newWindow.document.close();
-                          }
-                        }}
-                        disabled={!pairing.player2?.armyList}
-                        className={`text-xs ${pairing.player2?.armyList ? 'text-indigo-600 hover:text-indigo-900' : 'text-gray-400 cursor-not-allowed'}`}
-                      >
-                        View Army List
-                      </button>
+                          }}
+                        >
+                          View Army List
+                        </Button>
+                      )}
                     </div>
-                  </div>
-                </div>
+                  </Col>
+                </Row>
               </div>
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 }
 

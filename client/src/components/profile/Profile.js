@@ -74,9 +74,9 @@ function Profile() {
     }
 
     try {
+      setLoading(true);
       setError('');
       setSuccess('');
-      setLoading(true);
       
       // Update user profile data in Firestore
       const profileData = {
@@ -110,11 +110,12 @@ function Profile() {
   };
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+    // Removed bg-dark text-light classes
+    <div className="min-vh-100 d-flex flex-column">
+      {/* Changed navbar from dark to primary */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <Container>
-          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <span className="navbar-brand fw-bold">BLACKSTONE</span>
           <button
             onClick={() => navigate('/')}
             className="btn btn-outline-light"
@@ -125,8 +126,9 @@ function Profile() {
       </nav>
 
       <Container className="py-4 flex-grow-1">
-        <Card className="bg-dark text-light border-secondary">
-          <Card.Header className="bg-dark border-secondary">
+        {/* Removed dark theme styling from Card */}
+        <Card className="shadow">
+          <Card.Header className="bg-light">
             <h2 className="mb-0">Profile Information</h2>
             <p className="text-muted mb-0">Update your personal details and account settings.</p>
           </Card.Header>
@@ -147,17 +149,17 @@ function Profile() {
             <Form onSubmit={handleSubmit}>
               <Row>
                 <Col xs={12}>
-                  <h4 className="border-bottom border-secondary pb-2 mb-4">Personal Information</h4>
+                  <h4 className="border-bottom pb-2 mb-4">Personal Information</h4>
                 </Col>
                 <Col md={6} className="mb-3">
                   <Form.Group controlId="firstName">
                     <Form.Label>First name</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="text"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       placeholder="Enter your first name"
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
                 </Col>
@@ -165,12 +167,12 @@ function Profile() {
                 <Col md={6} className="mb-3">
                   <Form.Group controlId="lastName">
                     <Form.Label>Last name</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       placeholder="Enter your last name"
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
                 </Col>
@@ -178,28 +180,28 @@ function Profile() {
                 <Col xs={12} className="mb-3">
                   <Form.Group controlId="teamName">
                     <Form.Label>Team name</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="text"
                       value={teamName}
                       onChange={(e) => setTeamName(e.target.value)}
                       placeholder="Enter your team name"
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
                 </Col>
 
                 <Col xs={12}>
-                  <h4 className="border-bottom border-secondary pb-2 mb-4 mt-2">Account Settings</h4>
+                  <h4 className="border-bottom pb-2 mb-4 mt-2">Account Settings</h4>
                 </Col>
 
                 <Col xs={12} className="mb-3">
                   <Form.Group controlId="email">
                     <Form.Label>Email address</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
                 </Col>
@@ -207,11 +209,11 @@ function Profile() {
                 <Col md={6} className="mb-3">
                   <Form.Group controlId="newPassword">
                     <Form.Label>New password (leave blank to keep current)</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
                 </Col>
@@ -219,11 +221,11 @@ function Profile() {
                 <Col md={6} className="mb-3">
                   <Form.Group controlId="confirmPassword">
                     <Form.Label>Confirm new password</Form.Label>
+                    {/* Removed bg-dark text-light border-secondary from input */}
                     <Form.Control
                       type="password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="bg-dark text-light border-secondary"
                     />
                   </Form.Group>
                 </Col>
@@ -243,7 +245,8 @@ function Profile() {
         </Card>
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+      {/* Changed footer from dark to light theme */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>

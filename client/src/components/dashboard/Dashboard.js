@@ -125,7 +125,8 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div className="bg-dark text-light min-vh-100 d-flex flex-column justify-content-center align-items-center">
+      // Removed bg-dark text-light classes
+      <div className="min-vh-100 d-flex flex-column justify-content-center align-items-center">
         <Spinner animation="border" variant="primary" />
         <p className="mt-3">Loading dashboard...</p>
       </div>
@@ -134,7 +135,8 @@ function Dashboard() {
 
   if (error) {
     return (
-      <div className="bg-dark text-light min-vh-100 d-flex flex-column justify-content-center align-items-center">
+      // Removed bg-dark text-light classes
+      <div className="min-vh-100 d-flex flex-column justify-content-center align-items-center">
         <Alert variant="danger" className="mb-4">
           {error}
         </Alert>
@@ -154,16 +156,17 @@ function Dashboard() {
   }
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+    // Removed bg-dark text-light classes
+    <div className="min-vh-100 d-flex flex-column">
+      {/* Changed navbar from dark to primary */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <Container>
-          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <span className="navbar-brand fw-bold">BLACKSTONE</span>
           <div className="d-flex align-items-center">
-            <span className="me-3 text-light d-none d-md-inline">{currentUser.email}</span>
+            <span className="me-3 text-white d-none d-md-inline">{currentUser.email}</span>
             <button
               onClick={handleLogout}
-              className="btn btn-outline-danger"
+              className="btn btn-outline-light"
             >
               Log Out
             </button>
@@ -198,13 +201,13 @@ function Dashboard() {
           </div>
         </div>
         
-        {/* Tabs Navigation */}
-        <Nav variant="tabs" className="mb-4 border-bottom border-secondary">
+        {/* Changed tabs styling */}
+        <Nav variant="tabs" className="mb-4">
           <Nav.Item>
             <Nav.Link 
               active={activeTab === 'tournamentInfo'} 
               onClick={() => setActiveTab('tournamentInfo')}
-              className={activeTab === 'tournamentInfo' ? 'text-white bg-primary' : 'text-light'}
+              className={activeTab === 'tournamentInfo' ? 'text-white bg-primary' : ''}
             >
               Tournament Info
             </Nav.Link>
@@ -213,7 +216,7 @@ function Dashboard() {
             <Nav.Link 
               active={activeTab === 'playerDetails'} 
               onClick={() => setActiveTab('playerDetails')}
-              className={activeTab === 'playerDetails' ? 'text-white bg-primary' : 'text-light'}
+              className={activeTab === 'playerDetails' ? 'text-white bg-primary' : ''}
             >
               Player Details
             </Nav.Link>
@@ -222,7 +225,7 @@ function Dashboard() {
             <Nav.Link 
               active={activeTab === 'roster'} 
               onClick={() => setActiveTab('roster')}
-              className={activeTab === 'roster' ? 'text-white bg-primary' : 'text-light'}
+              className={activeTab === 'roster' ? 'text-white bg-primary' : ''}
             >
               Roster
             </Nav.Link>
@@ -231,7 +234,7 @@ function Dashboard() {
             <Nav.Link 
               active={activeTab === 'pairings'} 
               onClick={() => setActiveTab('pairings')}
-              className={activeTab === 'pairings' ? 'text-white bg-primary' : 'text-light'}
+              className={activeTab === 'pairings' ? 'text-white bg-primary' : ''}
             >
               Pairings
             </Nav.Link>
@@ -240,7 +243,7 @@ function Dashboard() {
             <Nav.Link 
               active={activeTab === 'placings'} 
               onClick={() => setActiveTab('placings')}
-              className={activeTab === 'placings' ? 'text-white bg-primary' : 'text-light'}
+              className={activeTab === 'placings' ? 'text-white bg-primary' : ''}
             >
               Placings
             </Nav.Link>
@@ -251,7 +254,8 @@ function Dashboard() {
         {renderTabContent()}
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary mt-auto">
+      {/* Changed footer from dark to light theme */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>

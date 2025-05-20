@@ -51,11 +51,12 @@ function MyEvents() {
   };
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* Navigation */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary">
+    // Removed bg-dark text-light classes
+    <div className="min-vh-100 d-flex flex-column">
+      {/* Changed navbar from dark to primary */}
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <Container>
-          <span className="navbar-brand fw-bold text-primary">BLACKSTONE</span>
+          <span className="navbar-brand fw-bold">BLACKSTONE</span>
           <button
             onClick={() => navigate('/')}
             className="btn btn-outline-light"
@@ -80,7 +81,8 @@ function MyEvents() {
             <p className="mt-3">Loading your events...</p>
           </div>
         ) : events.length === 0 ? (
-          <Card className="bg-dark border-secondary">
+          {/* Removed dark theme styling from Card */}
+          <Card className="shadow">
             <Card.Body className="text-center py-5">
               <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
               <h3 className="mt-3">No events found</h3>
@@ -94,10 +96,12 @@ function MyEvents() {
             </Card.Body>
           </Card>
         ) : (
-          <Card className="bg-dark border-secondary">
+          {/* Removed dark theme styling from Card */}
+          <Card className="shadow">
             <Card.Body>
               <div className="table-responsive">
-                <Table variant="dark" bordered hover className="mb-0">
+                {/* Changed table from variant="dark" to default light theme */}
+                <Table bordered hover className="mb-0">
                   <thead>
                     <tr>
                       <th>Event</th>
@@ -132,8 +136,9 @@ function MyEvents() {
                           {getStatusBadge(event.status)}
                         </td>
                         <td className="text-center">
+                          {/* Changed button from outline-light to outline-primary */}
                           <Button
-                            variant="outline-light"
+                            variant="outline-primary"
                             size="sm"
                             onClick={() => handleViewEvent(event.id)}
                           >
@@ -150,7 +155,8 @@ function MyEvents() {
         )}
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary mt-auto">
+      {/* Changed footer from dark to light theme */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>

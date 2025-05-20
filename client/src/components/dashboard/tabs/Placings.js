@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getTournamentPlacings } from '../../../services/databaseService';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Card, Table, Badge, Button } from 'react-bootstrap';
 
 function Placings({ tournamentId }) {
   const [placings, setPlacings] = useState([]);
@@ -46,129 +47,119 @@ function Placings({ tournamentId }) {
   const userPlacing = findUserPlacing();
 
   if (loading) {
-    return <div className="text-center py-10">Loading placings...</div>;
+    return <div className="text-center py-5">Loading placings...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500 text-center py-10">{error}</div>;
+    return <div className="text-danger text-center py-5">{error}</div>;
   }
 
   if (placings.length === 0) {
     return (
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Tournament Standings</h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            No standings information is available yet.
-          </p>
-        </div>
-      </div>
+      <Card className="shadow">
+        <Card.Header className="bg-light">
+          <h3 className="mb-0">Tournament Standings</h3>
+        </Card.Header>
+        <Card.Body className="text-center py-5">
+          <p className="mb-0">No standings information is available yet.</p>
+        </Card.Body>
+      </Card>
     );
   }
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">Tournament Standings</h3>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">
+    <Card className="shadow">
+      <Card.Header className="bg-light">
+        <h3 className="mb-0">Tournament Standings</h3>
+        <p className="text-muted mb-0">
           {tournamentComplete 
             ? 'Final tournament results.'
             : 'Current tournament standings. These may change as more rounds are completed.'}
         </p>
-      </div>
+      </Card.Header>
       
       {/* User's placing highlighted at the top if found */}
       {userPlacing && (
-        <div className="border-t border-gray-200 bg-yellow-50">
-          <div className="px-4 py-3 sm:px-6">
-            <h4 className="text-sm font-medium text-gray-900">Your Ranking</h4>
+        <div className="bg-light-yellow border-bottom">
+          <div className="px-3 py-2 bg-light">
+            <h4 className="h5 mb-0">Your Ranking</h4>
           </div>
-          <div className="px-4 py-5 sm:p-6">
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
+          <div className="p-3">
+            <div className="table-responsive">
+              <Table bordered hover size="sm" className="mb-0">
                 <thead>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Player</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faction</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Record</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Battle Points</th>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Team</th>
+                    <th>Faction</th>
+                    <th>Record</th>
+                    <th>Battle Points</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="bg-yellow-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{userPlacing.rank}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                  <tr className="table-warning">
+                    <td>{userPlacing.rank}</td>
+                    <td className="fw-bold">
                       {userPlacing.firstName} {userPlacing.lastName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{userPlacing.teamName || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{userPlacing.faction || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td>{userPlacing.teamName || '-'}</td>
+                    <td>{userPlacing.faction || '-'}</td>
+                    <td>
                       {userPlacing.wins || 0}-{userPlacing.losses || 0}-{userPlacing.draws || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td>
                       {userPlacing.battlePoints?.join(' / ') || '-'}
                       {userPlacing.totalBattlePoints && (
-                        <span className="ml-2 font-medium">({userPlacing.totalBattlePoints})</span>
+                        <span className="ms-2 fw-bold">({userPlacing.totalBattlePoints})</span>
                       )}
                     </td>
                   </tr>
                 </tbody>
-              </table>
+              </Table>
             </div>
           </div>
         </div>
       )}
       
       {/* All placings list */}
-      <div className="border-t border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+      <Card.Body>
+        <div className="table-responsive">
+          <Table bordered hover className="mb-0">
+            <thead>
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Player</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faction</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Record</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Battle Points</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Army List</th>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Team</th>
+                <th>Faction</th>
+                <th>Record</th>
+                <th>Battle Points</th>
+                <th>Army List</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {placings.map((player) => (
-                <tr key={player.id} className={player.userId === currentUser.uid ? 'bg-yellow-50' : ''}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{player.rank}</div>
+                <tr key={player.id} className={player.userId === currentUser.uid ? 'table-warning' : ''}>
+                  <td>{player.rank}</td>
+                  <td className="fw-bold">
+                    {player.firstName} {player.lastName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {player.firstName} {player.lastName}
-                    </div>
+                  <td>{player.teamName || '-'}</td>
+                  <td>{player.faction || '-'}</td>
+                  <td>
+                    {player.wins || 0}-{player.losses || 0}-{player.draws || 0}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{player.teamName || '-'}</div>
+                  <td>
+                    {player.battlePoints?.join(' / ') || '-'}
+                    {player.totalBattlePoints && (
+                      <span className="ms-2 fw-bold">({player.totalBattlePoints})</span>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{player.faction || '-'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {player.wins || 0}-{player.losses || 0}-{player.draws || 0}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {player.battlePoints?.join(' / ') || '-'}
-                      {player.totalBattlePoints && (
-                        <span className="ml-2 font-medium">({player.totalBattlePoints})</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="text-center">
                     {player.armyList ? (
-                      <button 
+                      <Button 
+                        variant="outline-primary"
+                        size="sm"
                         onClick={() => {
                           const newWindow = window.open('', '_blank');
                           newWindow.document.write(`
@@ -190,21 +181,20 @@ function Placings({ tournamentId }) {
                           `);
                           newWindow.document.close();
                         }}
-                        className="text-indigo-600 hover:text-indigo-900"
                       >
                         View List
-                      </button>
+                      </Button>
                     ) : (
-                      <span className="text-gray-400">Not submitted</span>
+                      <span className="text-muted">Not submitted</span>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
-          </table>
+          </Table>
         </div>
-      </div>
-    </div>
+      </Card.Body>
+    </Card>
   );
 }
 

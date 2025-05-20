@@ -17,11 +17,13 @@ function Home() {
   }
 
   return (
-    <div className="bg-dark text-light min-vh-100 d-flex flex-column">
-      {/* Navigation Bar */}
-      <Navbar bg="dark" variant="dark" expand="lg" className="border-bottom border-secondary">
+    // Changed from bg-dark text-light to default light theme
+    <div className="min-vh-100 d-flex flex-column">
+      {/* Navigation Bar - changed bg from dark to primary */}
+      <Navbar bg="primary" variant="dark" expand="lg" className="border-bottom">
         <Container>
-          <Navbar.Brand href="/" className="fw-bold text-primary">BLACKSTONE</Navbar.Brand>
+          {/* Kept text-primary for brand emphasis */}
+          <Navbar.Brand href="/" className="fw-bold">BLACKSTONE</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between">
             {currentUser && (
@@ -35,11 +37,12 @@ function Home() {
             <Nav>
               {currentUser ? (
                 <div className="d-flex align-items-center">
-                  <span className="me-3 text-light">{currentUser.email}</span>
+                  {/* Changed text-light to text-white to keep readable on primary background */}
+                  <span className="me-3 text-white">{currentUser.email}</span>
                   <Button variant="danger" onClick={handleLogout}>Log Out</Button>
                 </div>
               ) : (
-                <Button variant="primary" onClick={() => navigate('/login')}>Log In</Button>
+                <Button variant="light" onClick={() => navigate('/login')}>Log In</Button>
               )}
             </Nav>
           </Navbar.Collapse>
@@ -47,11 +50,11 @@ function Home() {
       </Navbar>
 
       <Container className="py-4 flex-grow-1">
-        {/* Welcome Section */}
-        <Card className="bg-dark text-light mb-4 border-secondary">
+        {/* Welcome Section - removed dark styling */}
+        <Card className="mb-4">
           <Card.Body>
             <Card.Title className="h3">Welcome to Blackstone</Card.Title>
-            <Card.Text className="text-light">
+            <Card.Text>
               Your tabletop wargaming tournament management platform.
             </Card.Text>
             <Card.Text className="text-muted">
@@ -65,9 +68,9 @@ function Home() {
         {/* Main Content */}
         {currentUser ? (
           <Row xs={1} md={3} className="g-4">
-            {/* My Profile Card */}
+            {/* My Profile Card - removed dark styling */}
             <Col>
-              <Card className="h-100 bg-dark text-light border-secondary">
+              <Card className="h-100 shadow-sm">
                 <Card.Body className="d-flex flex-column">
                   <div className="d-flex align-items-center mb-3">
                     <div className="bg-primary bg-opacity-25 p-3 rounded-circle me-3">
@@ -85,9 +88,9 @@ function Home() {
               </Card>
             </Col>
             
-            {/* Search Events Card */}
+            {/* Search Events Card - removed dark styling */}
             <Col>
-              <Card className="h-100 bg-dark text-light border-secondary">
+              <Card className="h-100 shadow-sm">
                 <Card.Body className="d-flex flex-column">
                   <div className="d-flex align-items-center mb-3">
                     <div className="bg-info bg-opacity-25 p-3 rounded-circle me-3">
@@ -105,9 +108,9 @@ function Home() {
               </Card>
             </Col>
             
-            {/* My Events Card */}
+            {/* My Events Card - removed dark styling */}
             <Col>
-              <Card className="h-100 bg-dark text-light border-secondary">
+              <Card className="h-100 shadow-sm">
                 <Card.Body className="d-flex flex-column">
                   <div className="d-flex align-items-center mb-3">
                     <div className="bg-warning bg-opacity-25 p-3 rounded-circle me-3">
@@ -128,7 +131,8 @@ function Home() {
         ) : (
           <Row className="justify-content-center mt-5">
             <Col md={6}>
-              <Card className="bg-dark text-light border-secondary text-center">
+              {/* Login card - removed dark styling */}
+              <Card className="text-center shadow">
                 <Card.Body>
                   <div className="d-inline-flex bg-primary bg-opacity-25 p-3 rounded-circle mb-4">
                     <i className="bi bi-person-circle text-primary fs-1"></i>
@@ -153,7 +157,8 @@ function Home() {
         )}
       </Container>
 
-      <footer className="bg-dark text-muted text-center py-3 border-top border-secondary">
+      {/* Changed footer from dark to light styling */}
+      <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>
         </Container>
