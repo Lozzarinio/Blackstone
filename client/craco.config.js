@@ -1,10 +1,4 @@
 module.exports = {
-    style: {
-      postcss: {
-        plugins: [
-          require('tailwindcss'),
-          require('autoprefixer'),
-        ],
-      },
-    },
-  }
+  // Remove any Tailwind-specific configuration
+  // This file might be empty or just include other configurations
+}
