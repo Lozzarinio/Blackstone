@@ -7,10 +7,12 @@ import {
   setDoc, 
   addDoc, 
   updateDoc, 
+  deleteDoc,
   query, 
   where, 
   orderBy, 
-  limit
+  limit,
+  writeBatch
 } from 'firebase/firestore';
 
 // Tournament Services
@@ -381,6 +383,304 @@ export const registerForTournament = async (userId, tournamentId, playerData) =>
     };
   } catch (error) {
     console.error('Error registering for tournament:', error);
+    throw error;
+  }
+};
+
+// Organiser Services
+
+// Check if a user is an organiser
+export const checkIfUserIsOrganiser = async (userId) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      return userDoc.data().isOrganiser === true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking if user is organiser:', error);
+    return false;
+  }
+};
+
+// Make a user an organiser
+export const makeUserOrganiser = async (userId) => {
+  try {
+    await updateDoc(doc(db, 'users', userId), {
+      isOrganiser: true,
+      updatedAt: new Date()
+    });
+    return true;
+  } catch (error) {
+    console.error('Error making user an organiser:', error);
+    throw error;
+  }
+};
+
+// Get tournaments created by a specific organiser
+export const getUserCreatedTournaments = async (userId) => {
+  try {
+    const tournamentsQuery = query(
+      collection(db, 'tournaments'),
+      where('ownerId', '==', userId),
+      orderBy('date', 'desc')
+    );
+    
+    const snapshot = await getDocs(tournamentsQuery);
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error fetching user created tournaments:', error);
+    throw error;
+  }
+};
+
+// Create a new tournament
+export const createTournament = async (tournamentData) => {
+  try {
+    const tournamentRef = await addDoc(collection(db, 'tournaments'), {
+      ...tournamentData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    return tournamentRef.id;
+  } catch (error) {
+    console.error('Error creating tournament:', error);
+    throw error;
+  }
+};
+
+// Update an existing tournament
+export const updateTournament = async (tournamentId, tournamentData) => {
+  try {
+    await updateDoc(doc(db, 'tournaments', tournamentId), {
+      ...tournamentData,
+      updatedAt: new Date()
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating tournament:', error);
+    throw error;
+  }
+};
+
+// Update tournament status (upcoming, inProgress, completed)
+export const updateTournamentStatus = async (tournamentId, status) => {
+  try {
+    await updateDoc(doc(db, 'tournaments', tournamentId), {
+      status,
+      updatedAt: new Date()
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating tournament status:', error);
+    throw error;
+  }
+};
+
+// Generate pairings for a round
+export const generatePairings = async (tournamentId, roundNumber, pairingMethod = 'random') => {
+  try {
+    // First, get all checked-in participants
+    const participantsQuery = query(
+      collection(db, 'participants'),
+      where('tournamentId', '==', tournamentId),
+      where('participationStatus', '==', 'checkedIn')
+    );
+    
+    const participantsSnapshot = await getDocs(participantsQuery);
+    const participants = participantsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    if (participants.length < 2) {
+      throw new Error('Not enough participants to generate pairings');
+    }
+    
+    // Create a round document
+    const roundRef = await addDoc(collection(db, 'rounds'), {
+      tournamentId,
+      roundNumber,
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      startTime: new Date(),
+      endTime: null
+    });
+    
+    // Logic for different pairing methods would go here
+    // For now, we'll just implement random pairings
+    
+    // Shuffle the participants array
+    let shuffledParticipants = [...participants];
+    for (let i = shuffledParticipants.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledParticipants[i], shuffledParticipants[j]] = [shuffledParticipants[j], shuffledParticipants[i]];
+    }
+    
+    // Create pairings
+    const pairings = [];
+    for (let i = 0; i < shuffledParticipants.length; i += 2) {
+      if (i + 1 < shuffledParticipants.length) {
+        // Two participants for a pairing
+        const pairingRef = await addDoc(collection(db, 'pairings'), {
+          tournamentId,
+          roundId: roundRef.id,
+          player1Id: shuffledParticipants[i].id,
+          player2Id: shuffledParticipants[i + 1].id,
+          tableNumber: (i / 2) + 1,
+          player1Score: null,
+          player2Score: null,
+          winner: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        
+        pairings.push({
+          id: pairingRef.id,
+          tableNumber: (i / 2) + 1,
+          player1: shuffledParticipants[i],
+          player2: shuffledParticipants[i + 1]
+        });
+      } else {
+        // One participant left without a pairing (bye)
+        const pairingRef = await addDoc(collection(db, 'pairings'), {
+          tournamentId,
+          roundId: roundRef.id,
+          player1Id: shuffledParticipants[i].id,
+          player2Id: null,
+          tableNumber: (i / 2) + 1,
+          player1Score: null,
+          player2Score: null,
+          winner: 'player1', // Automatic win for the player with a bye
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        
+        pairings.push({
+          id: pairingRef.id,
+          tableNumber: (i / 2) + 1,
+          player1: shuffledParticipants[i],
+          player2: null
+        });
+      }
+    }
+    
+    // Update round status to inProgress
+    await updateDoc(doc(db, 'rounds', roundRef.id), {
+      status: 'inProgress',
+      updatedAt: new Date()
+    });
+    
+    return pairings;
+  } catch (error) {
+    console.error('Error generating pairings:', error);
+    throw error;
+  }
+};
+
+// Record match result
+export const recordMatchResult = async (pairingId, player1Score, player2Score) => {
+  try {
+    let winner = null;
+    
+    if (player1Score > player2Score) {
+      winner = 'player1';
+    } else if (player2Score > player1Score) {
+      winner = 'player2';
+    } else {
+      winner = 'draw';
+    }
+    
+    await updateDoc(doc(db, 'pairings', pairingId), {
+      player1Score,
+      player2Score,
+      winner,
+      updatedAt: new Date()
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error recording match result:', error);
+    throw error;
+  }
+};
+
+// Complete a round
+export const completeRound = async (roundId) => {
+  try {
+    await updateDoc(doc(db, 'rounds', roundId), {
+      status: 'completed',
+      endTime: new Date(),
+      updatedAt: new Date()
+    });
+    
+    return true;
+  } catch (error) {
+    console.error('Error completing round:', error);
+    throw error;
+  }
+};
+
+// Add participant to tournament
+export const addParticipant = async (tournamentId, participantData) => {
+  try {
+    const participantRef = await addDoc(collection(db, 'participants'), {
+      tournamentId,
+      ...participantData,
+      listStatus: 'unsubmitted',
+      participationStatus: 'registered',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    
+    return participantRef.id;
+  } catch (error) {
+    console.error('Error adding participant:', error);
+    throw error;
+  }
+};
+
+// Remove participant from tournament
+export const removeParticipant = async (participantId) => {
+  try {
+    await deleteDoc(doc(db, 'participants', participantId));
+    return true;
+  } catch (error) {
+    console.error('Error removing participant:', error);
+    throw error;
+  }
+};
+
+// Bulk check-in participants
+export const checkInAllParticipants = async (tournamentId) => {
+  try {
+    const participantsQuery = query(
+      collection(db, 'participants'),
+      where('tournamentId', '==', tournamentId),
+      where('participationStatus', '==', 'registered')
+    );
+    
+    const participantsSnapshot = await getDocs(participantsQuery);
+    
+    const batch = writeBatch(db);
+    participantsSnapshot.docs.forEach(doc => {
+      batch.update(doc.ref, {
+        participationStatus: 'checkedIn',
+        updatedAt: new Date()
+      });
+    });
+    
+    await batch.commit();
+    return true;
+  } catch (error) {
+    console.error('Error checking in all participants:', error);
     throw error;
   }
 };

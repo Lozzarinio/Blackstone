@@ -151,8 +151,8 @@ function TournamentList() {
             <p className="mt-3">Loading tournaments...</p>
           </div>
         ) : tournaments.length === 0 ? (
-          {/* Removed dark theme styling from Card */}
           <Card className="shadow">
+            {/* Removed dark theme styling from Card */}
             <Card.Body className="text-center py-5">
               <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
               <h3 className="mt-3">No tournaments available</h3>
@@ -163,8 +163,8 @@ function TournamentList() {
           <Row>
             {tournaments.map((tournament) => (
               <Col xs={12} className="mb-4" key={tournament.id}>
-                {/* Removed dark theme styling from Card */}
                 <Card className="h-100 shadow">
+                  {/* Removed dark theme styling from Card */}
                   <Card.Body>
                     <div className="d-flex flex-column flex-md-row justify-content-between">
                       <div className="mb-3 mb-md-0">

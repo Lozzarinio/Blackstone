@@ -10,6 +10,10 @@ import TournamentDetails from './components/tournaments/TournamentDetails';
 import Home from './components/home/Home';
 import MyEvents from './components/events/MyEvents';
 import Profile from './components/profile/Profile';
+import OrganiserDashboard from './components/organiser/OrganiserDashboard';
+import TournamentForm from './components/organiser/TournamentForm';
+import TournamentManagement from './components/organiser/TournamentManagement';
+import OrganiserRoute from './components/organiser/OrganiserRoute';
 import './App.css';
 
 // Protected route component
@@ -76,6 +80,43 @@ function App() {
                 <PrivateRoute>
                   <MyEvents />
                 </PrivateRoute>
+              } 
+            />
+            
+            {/* Organiser Routes - Using OrganiserRoute for access control */}
+            <Route 
+              path="/organiser" 
+              element={
+                <PrivateRoute>
+                  <OrganiserDashboard />
+                </PrivateRoute>
+              } 
+            />
+            
+            <Route 
+              path="/create-tournament" 
+              element={
+                <OrganiserRoute>
+                  <TournamentForm />
+                </OrganiserRoute>
+              } 
+            />
+            
+            <Route 
+              path="/edit-tournament/:tournamentId" 
+              element={
+                <OrganiserRoute>
+                  <TournamentForm />
+                </OrganiserRoute>
+              } 
+            />
+            
+            <Route 
+              path="/manage-tournament/:tournamentId" 
+              element={
+                <OrganiserRoute>
+                  <TournamentManagement />
+                </OrganiserRoute>
               } 
             />
             

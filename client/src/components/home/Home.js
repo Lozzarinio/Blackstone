@@ -1,11 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Container, Navbar, Nav, Card, Button, Row, Col } from 'react-bootstrap';
+import { checkIfUserIsOrganiser } from '../../services/databaseService';
+import { Container, Navbar, Nav, Card, Button, Row, Col, Spinner } from 'react-bootstrap';
 
 function Home() {
   const { currentUser, logout } = useAuth();
+  const [isOrganiser, setIsOrganiser] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkOrganiserStatus = async () => {
+      if (!currentUser) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const organiserStatus = await checkIfUserIsOrganiser(currentUser.uid);
+        setIsOrganiser(organiserStatus);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error checking organiser status:', error);
+        setLoading(false);
+      }
+    };
+
+    checkOrganiserStatus();
+  }, [currentUser]);
 
   async function handleLogout() {
     try {
@@ -17,12 +40,10 @@ function Home() {
   }
 
   return (
-    // Changed from bg-dark text-light to default light theme
     <div className="min-vh-100 d-flex flex-column">
-      {/* Navigation Bar - changed bg from dark to primary */}
+      {/* Navigation Bar */}
       <Navbar bg="primary" variant="dark" expand="lg" className="border-bottom">
         <Container>
-          {/* Kept text-primary for brand emphasis */}
           <Navbar.Brand href="/" className="fw-bold">BLACKSTONE</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav" className="justify-content-between">
@@ -32,12 +53,12 @@ function Home() {
                 <Nav.Link href="/profile">Profile</Nav.Link>
                 <Nav.Link href="/tournaments">Tournaments</Nav.Link>
                 <Nav.Link href="/my-events">My Events</Nav.Link>
+                {isOrganiser && <Nav.Link href="/organiser">Organiser</Nav.Link>}
               </Nav>
             )}
             <Nav>
               {currentUser ? (
                 <div className="d-flex align-items-center">
-                  {/* Changed text-light to text-white to keep readable on primary background */}
                   <span className="me-3 text-white">{currentUser.email}</span>
                   <Button variant="danger" onClick={handleLogout}>Log Out</Button>
                 </div>
@@ -50,7 +71,7 @@ function Home() {
       </Navbar>
 
       <Container className="py-4 flex-grow-1">
-        {/* Welcome Section - removed dark styling */}
+        {/* Welcome Section */}
         <Card className="mb-4">
           <Card.Body>
             <Card.Title className="h3">Welcome to Blackstone</Card.Title>
@@ -67,8 +88,8 @@ function Home() {
 
         {/* Main Content */}
         {currentUser ? (
-          <Row xs={1} md={3} className="g-4">
-            {/* My Profile Card - removed dark styling */}
+          <Row xs={1} md={2} lg={isOrganiser ? 4 : 3} className="g-4">
+            {/* My Profile Card */}
             <Col>
               <Card className="h-100 shadow-sm">
                 <Card.Body className="d-flex flex-column">
@@ -88,7 +109,7 @@ function Home() {
               </Card>
             </Col>
             
-            {/* Search Events Card - removed dark styling */}
+            {/* Search Events Card */}
             <Col>
               <Card className="h-100 shadow-sm">
                 <Card.Body className="d-flex flex-column">
@@ -108,7 +129,7 @@ function Home() {
               </Card>
             </Col>
             
-            {/* My Events Card - removed dark styling */}
+            {/* My Events Card */}
             <Col>
               <Card className="h-100 shadow-sm">
                 <Card.Body className="d-flex flex-column">
@@ -127,11 +148,55 @@ function Home() {
                 </Card.Body>
               </Card>
             </Col>
+            
+            {/* Tournament Organiser Card - Only shown to organisers */}
+            {isOrganiser && (
+              <Col>
+                <Card className="h-100 shadow-sm">
+                  <Card.Body className="d-flex flex-column">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="bg-success bg-opacity-25 p-3 rounded-circle me-3">
+                        <i className="bi bi-tools text-success fs-4"></i>
+                      </div>
+                      <Card.Title className="mb-0">Tournament Organiser</Card.Title>
+                    </div>
+                    <Card.Text className="flex-grow-1">
+                      Create and manage your own tournaments, handle registrations, and run events with ease.
+                    </Card.Text>
+                    <Button variant="success" className="w-100" onClick={() => navigate('/organiser')}>
+                      Organiser Dashboard
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
+            
+            {/* Card offering to become an organiser - Only shown to non-organisers */}
+            {!isOrganiser && !loading && (
+              <Col>
+                <Card className="h-100 shadow-sm">
+                  <Card.Body className="d-flex flex-column">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="bg-success bg-opacity-25 p-3 rounded-circle me-3">
+                        <i className="bi bi-trophy text-success fs-4"></i>
+                      </div>
+                      <Card.Title className="mb-0">Become an Organiser</Card.Title>
+                    </div>
+                    <Card.Text className="flex-grow-1">
+                      Want to host tournaments? Become an organiser to create and manage your own events.
+                    </Card.Text>
+                    <Button variant="success" className="w-100" onClick={() => navigate('/organiser')}>
+                      Get Started
+                    </Button>
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
           </Row>
         ) : (
           <Row className="justify-content-center mt-5">
             <Col md={6}>
-              {/* Login card - removed dark styling */}
+              {/* Login card */}
               <Card className="text-center shadow">
                 <Card.Body>
                   <div className="d-inline-flex bg-primary bg-opacity-25 p-3 rounded-circle mb-4">
@@ -157,7 +222,6 @@ function Home() {
         )}
       </Container>
 
-      {/* Changed footer from dark to light styling */}
       <footer className="bg-light text-muted text-center py-3 border-top mt-auto">
         <Container>
           <p className="mb-0">&copy; {new Date().getFullYear()} Blackstone. All rights reserved.</p>

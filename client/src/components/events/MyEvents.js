@@ -81,8 +81,8 @@ function MyEvents() {
             <p className="mt-3">Loading your events...</p>
           </div>
         ) : events.length === 0 ? (
-          {/* Removed dark theme styling from Card */}
           <Card className="shadow">
+            {/* Removed dark theme styling from Card */}
             <Card.Body className="text-center py-5">
               <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
               <h3 className="mt-3">No events found</h3>
@@ -96,8 +96,8 @@ function MyEvents() {
             </Card.Body>
           </Card>
         ) : (
-          {/* Removed dark theme styling from Card */}
           <Card className="shadow">
+            {/* Removed dark theme styling from Card */}
             <Card.Body>
               <div className="table-responsive">
                 {/* Changed table from variant="dark" to default light theme */}

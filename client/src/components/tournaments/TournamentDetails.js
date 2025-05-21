@@ -135,8 +135,8 @@ function TournamentDetails() {
             <p className="mt-3">Loading tournament details...</p>
           </div>
         ) : !tournament ? (
-          {/* Removed dark theme styling from Card */}
           <Card className="shadow">
+            {/* Removed dark theme styling from Card */}
             <Card.Body className="text-center py-5">
               <i className="bi bi-calendar-x text-muted" style={{ fontSize: '3rem' }}></i>
               <h3 className="mt-3">Tournament Not Found</h3>
@@ -182,8 +182,8 @@ function TournamentDetails() {
 
             <Row className="mb-4">
               <Col lg={8}>
-                {/* Removed dark theme styling from Card */}
                 <Card className="shadow mb-4">
+                  {/* Removed dark theme styling from Card */}
                   <Card.Header className="bg-light">
                     <h4 className="mb-0">Tournament Details</h4>
                   </Card.Header>
@@ -236,8 +236,8 @@ function TournamentDetails() {
                   </Card.Body>
                 </Card>
 
-                {/* Removed dark theme styling from Card */}
                 <Card className="shadow">
+                  {/* Removed dark theme styling from Card */}
                   <Card.Header className="bg-light">
                     <h4 className="mb-0">Event Rules</h4>
                   </Card.Header>
@@ -254,8 +254,8 @@ function TournamentDetails() {
               </Col>
 
               <Col lg={4}>
-                {/* Removed dark theme styling from Card */}
                 <Card className="shadow mb-4">
+                  {/* Removed dark theme styling from Card */}
                   <Card.Header className="bg-light">
                     <h4 className="mb-0">Location</h4>
                   </Card.Header>
@@ -293,8 +293,8 @@ function TournamentDetails() {
                   </Card.Body>
                 </Card>
 
-                {/* Removed dark theme styling from Card */}
                 <Card className="shadow">
+                  {/* Removed dark theme styling from Card */}
                   <Card.Header className="bg-light">
                     <h4 className="mb-0">Organizer</h4>
                   </Card.Header>
